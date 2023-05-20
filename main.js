@@ -69,7 +69,7 @@ class BasicWorldDemo {
     this._scene.background = texture;
 
     const plane = new THREE.Mesh(
-        new THREE.PlaneGeometry(100, 100, 10, 10),
+        new THREE.PlaneGeometry(1000, 1000, 10, 10),
         new THREE.MeshStandardMaterial({
             color: 0xFFFFFF,
           }));
