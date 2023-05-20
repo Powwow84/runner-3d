@@ -117,6 +117,21 @@ scene.add(box2)
 box2.position.set(0,15,10)
 // box2.material.map = textureLoader.load('public/imgs/space-2560x1440-l122pd4lxyo3fug5.jpeg')
 
+const plane2Geometry = new THREE.PlaneGeometry(10,10,10,10)
+const plane2Material = new THREE.MeshBasicMaterial({
+  color: 0xFFFFFF,
+  wireframe: true
+})
+const plane2 = new THREE.Mesh(plane2Geometry, plane2Material)
+scene.add(plane2)
+plane2.position.set(10,10,15)
+
+plane2.geometry.attributes.position.array[0] -= 10 * Math.random()
+plane2.geometry.attributes.position.array[1] -= 10 * Math.random()
+plane2.geometry.attributes.position.array[2] -= 10 * Math.random()
+const lastPointz = plane2.geometry.attributes.position.array.length -1
+plane2.geometry.attributes.position.array[lastPointz] -= 10 * Math.random()
+
 const gui = new dat.GUI()
 
 const options = {
@@ -152,6 +167,9 @@ window.addEventListener('mousemove', function(e){
 
 const rayCaster = new THREE.Raycaster()
 
+const sphereId = sphere.id
+box2.name = 'theBox'
+
 function animate(time) {
   box.rotation.x = time / 1000
   box.rotation.y = time / 1000
@@ -167,6 +185,23 @@ function animate(time) {
   rayCaster.setFromCamera(mousePosition, camera)
   const intersects = rayCaster.intersectObjects(scene.children)
   console.log(intersects)
+
+  for(let i = 0; i < intersects.length; i++) {
+    if(intersects[i].object.id === sphereId)
+      intersects[i].object.material.color.set(0xFF0000)
+
+    if(intersects[i].object.name === 'theBox') {
+      intersects[i].object.rotation.x = time/1000
+      intersects[i].object.rotation.y = time/1000
+
+    }
+  }
+
+  plane2.geometry.attributes.position.array[0] = 10 * Math.random()
+  plane2.geometry.attributes.position.array[1] = 10 * Math.random()
+  plane2.geometry.attributes.position.array[2] = 10 * Math.random()
+  plane2.geometry.attributes.position.array[lastPointz] = 10 * Math.random()
+  plane2.geometry.attributes.position.needsUpdate = true
 
   renderer.render(scene, camera)
 }
