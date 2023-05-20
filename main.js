@@ -2,7 +2,9 @@ import * as THREE from "three"
 import { DirectionalLightHelper, GridHelper } from "three"
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js'
 import * as dat from  'dat.gui'
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 
+const monkeyUrl = new URL('public/imgs/Untitled design/character.fbx', import.meta.url)
 
 const renderer = new THREE.WebGLRenderer()
 
@@ -132,6 +134,39 @@ plane2.geometry.attributes.position.array[2] -= 10 * Math.random()
 const lastPointz = plane2.geometry.attributes.position.array.length -1
 plane2.geometry.attributes.position.array[lastPointz] -= 10 * Math.random()
 
+const sphere2Geometry = new THREE.SphereGeometry(4)
+
+// const vShader = `
+//   void main() {
+//     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0)
+//   }
+// `;
+
+// const fShader = `
+//   void main() {
+//     gl_FragColor = vec4(0.5, 0.5, 1.0, 1.0)
+//   }
+//   `;
+
+
+// const sphere2Material = new THREE.ShaderMaterial({
+//   vertexShader: document.getElementById('vertexShader').textContent,
+//   fragmentShader: document.getElementById('fragmentShader').textContent
+// })
+// const sphere2 = new THREE.Mesh(sphere2Geometry, sphere2Material)
+// scene.add(sphere2)
+// sphere2.position.set(-5,10,10)
+
+const assetLoader = new FBXLoader()
+
+assetLoader.load('public/imgs/Untitled design/Start Walking.fbx', function(fbx) {
+  const model = fbx.scene
+  scene.add(model)
+  model.position.set(-12, 4, 10)
+}, undefined, function(error){
+  console.error(error)
+})
+
 const gui = new dat.GUI()
 
 const options = {
@@ -197,13 +232,19 @@ function animate(time) {
     }
   }
 
-  plane2.geometry.attributes.position.array[0] = 10 * Math.random()
-  plane2.geometry.attributes.position.array[1] = 10 * Math.random()
-  plane2.geometry.attributes.position.array[2] = 10 * Math.random()
-  plane2.geometry.attributes.position.array[lastPointz] = 10 * Math.random()
-  plane2.geometry.attributes.position.needsUpdate = true
+  // plane2.geometry.attributes.position.array[0] = 10 * Math.random()
+  // plane2.geometry.attributes.position.array[1] = 10 * Math.random()
+  // plane2.geometry.attributes.position.array[2] = 10 * Math.random()
+  // plane2.geometry.attributes.position.array[lastPointz] = 10 * Math.random()
+  // plane2.geometry.attributes.position.needsUpdate = true
 
   renderer.render(scene, camera)
 }
 
 renderer.setAnimationLoop(animate)
+
+window.addEventListener('resize', function() {
+  camera.aspect = window.innerWidth / this.window.innerHeight
+  camera.updateProjectionMatrix()
+  renderer.setSize(window.innerWidth, window.innerHeight)
+})
