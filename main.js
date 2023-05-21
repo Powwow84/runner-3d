@@ -1,7 +1,8 @@
 import * as THREE from 'three'
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js'
 import * as CANNON from 'cannon-es'
-import { SphereGeometry } from 'three'
+import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js';
+
 
 const renderer = new THREE.WebGLRenderer()
 renderer.setSize(window.innerWidth, window.innerHeight)
@@ -15,8 +16,44 @@ const camera = new THREE.PerspectiveCamera(
 
 const orbit = new OrbitControls(camera, renderer.domElement)
 
-camera.position.set(0, 20, -30)
-orbit.update()
+// camera.position.set(0, 20, -30)
+// orbit.update()
+
+const controls = new PointerLockControls(camera, document.body)
+scene.add(controls.getObject())
+
+document.body.addEventListener('click', () => {
+  controls.lock();
+});
+
+
+document.addEventListener('mousemove', (event) => {
+  if(controls.isLocked) {
+    const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0
+    const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0
+
+    controls.updateRotation(movementX, movementY)
+  }
+})
+
+function handleKeyDown(event) {
+  switch (event.code) {
+    case 'KeyW':
+      controls.moveForward(.5)
+      break;
+    case 'KeyS':
+      controls.moveForward(-.5)
+      break;
+    case 'KeyA':
+      controls.moveRight(-.5)
+      break;
+    case 'KeyD':
+      controls.moveRight(.5)
+      break;
+  }
+}
+
+document.addEventListener('keydown', handleKeyDown)
 
 const boxGeo = new THREE.BoxGeometry(2 ,2 ,2)
 const boxMat = new THREE.MeshBasicMaterial({
@@ -51,6 +88,13 @@ scene.add(groundMesh)
 const world = new CANNON.World({
   gravity: new CANNON.Vec3(0 , -9.81, 0)
 })
+
+const cameraBody = new CANNON.Body({
+  mass: 10,
+  shape: new CANNON.Sphere(1)
+})
+world.addBody(cameraBody)
+cameraBody.position.set(0, 0, 1)
 
 const groundPhysMat = new CANNON.Material()
 
@@ -105,11 +149,25 @@ const groundSphereContactMat = new CANNON.ContactMaterial(
 
 world.addContactMaterial(groundSphereContactMat)
 
-const timeStep = 1/60
+const timeStep = 1/60.0
 
 
 function animate() {
   world.step(timeStep)
+
+  // controls.update(); // Update the controls
+  camera.position.copy(controls.getObject().position);
+  camera.quaternion.copy(controls.getObject().quaternion);
+  
+  // camera.position.copy(controls.getObject().position);
+  // camera.quaternion.copy(controls.getObject().quaternion);
+
+
+  // controls.getObject().position.copy(cameraBody.position);
+  // controls.getObject().quaternion.copy(cameraBody.quaternion);
+
+  // camera.position.copy(cameraBody.position)
+  // camera.quaternion.copy(cameraBody.quaternion)
 
   groundMesh.position.copy(groundBody.position)
   groundMesh.quaternion.copy(groundBody.quaternion)
