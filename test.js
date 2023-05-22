@@ -1,53 +1,37 @@
-// import * as THREE from 'three';
-// import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
+// import * as THREE from 'three'
 // import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js'
+// import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
 // import * as CANNON from 'cannon-es'
 
-// const scene = new THREE.Scene();
-// const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-// const renderer = new THREE.WebGLRenderer();
-
-// renderer.setPixelRatio(window.devicePixelRatio);
-// renderer.setSize(window.innerWidth, window.innerHeight);
-// document.body.appendChild(renderer.domElement);
 
 
-// const textureLoader = new THREE.TextureLoader()
-// const cubeTextureLoader = new THREE.CubeTextureLoader()
-// scene.background = cubeTextureLoader.load([
-//   'public/imgs/Untitled design/Untitled design (1).jpg',
-//   'public/imgs/Untitled design/Untitled design (1).jpg',
-//   'public/imgs/Untitled design/Untitled design (9).png',
-//   'public/imgs/Untitled design/Untitled design (1).jpg',
-//   'public/imgs/Untitled design/Untitled design (1).jpg',
-//   'public/imgs/Untitled design/Untitled design (1).jpg',
-// ])
 
-// const planeGeometry = new THREE.PlaneGeometry(1000,1000)
+// // --------------Three Js setup ----------------
+// const renderer = new THREE.WebGLRenderer()
+// renderer.setSize(window.innerWidth, window.innerHeight)
+// document.body.appendChild(renderer.domElement)
 
-// const planeMaterial = new THREE.MeshBasicMaterial({
-//   map: textureLoader.load('public/imgs/Untitled design/pavement_04_disp_4k.png')
+// const scene = new THREE.Scene()
+
+// const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000 )
+
+// // const orbit = new OrbitControls(camera, renderer.domElement)
+
+// camera.position.set(0, 2, 10)
+// // orbit.update()
+
+// //  Cannon Declaration the rest of the asset building will be with its three js counter part
+// const world = new CANNON.World({
+//   gravity: new CANNON.Vec3(0, -9.81, 0)
 // })
-// const plane = new THREE.Mesh(planeGeometry, planeMaterial)
-// scene.add(plane)
-// plane.rotation.x = -0.5 * Math.PI
-
-// const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
-// const boxMaterial = new THREE.MeshBasicMaterial({ color: 0x00FF00 });
-// const box = new THREE.Mesh(boxGeometry, boxMaterial);
-// scene.add(box);
-// box.position.set(0,1,0)
 
 
-
-
-// const orbit = new OrbitControls(camera, renderer.domElement)
-// camera.position.set(0, 1, 3);
-// orbit.update()
+// // --------Controls -----------
 
 // const controls = new PointerLockControls(camera, document.body);
 // scene.add(controls.getObject());
 
+// // Event listener to start the pointer lock when user clicks the scene
 // document.body.addEventListener('click', () => {
 //   controls.lock();
 // });
@@ -83,79 +67,89 @@
 
 // document.addEventListener('keydown', handleKeyDown);
 
-// const world = new CANNON.World({
-//   gravity: new CANNON.Vec3(0, -9.81, 0)
+
+// // ------------------Plane --------------
+
+// const planeGeometry = new THREE.PlaneGeometry(30, 30)
+// const planeMaterial = new THREE.MeshBasicMaterial({ color : 0xFFFFFF})
+// const plane = new THREE.Mesh(planeGeometry, planeMaterial)
+// scene.add(plane)
+// plane.rotation.x = -0.5* Math.PI
+
+// const planePhysicsMat = new CANNON.Material()
+// const planeBody = new CANNON.Body({
+//   shape: new CANNON.Plane(),
+//   mass: 0,
+//   material: planePhysicsMat
 // })
+// world.addBody(planeBody)
+// planeBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0) 
 
+// // ----------------------Box -------------------
 
-// // ****************** camera 
-// const cameraPhyMat = new CANNON.Material()
-
-// const cameraBody = new CANNON.Body({
-//   mass: 1,
-//   shape: new CANNON.Box(new CANNON.Vec3(.5,.5, .5)),
-//   material: cameraPhyMat
+// const boxGeo = new THREE.BoxGeometry(2 ,2 ,2)
+// const boxMat = new THREE.MeshBasicMaterial({
+//   color: 0x00ff00,
 // })
-// world.addBody(cameraBody)
-// cameraBody.position.set(0, 1, 3)
+// const boxMesh = new THREE.Mesh(boxGeo, boxMat)
+// scene.add(boxMesh)
 
-
-// // ************************** plane
-
-// const groundPhysMat = new CANNON.Material()
-
-// const groundBody = new CANNON.Body({
-//   // shape: new CANNON.Plane(),
-//   // mass: 10, // giving this mass sends it falling down the y axis  since in our vec 3 we set it to -9.81
-//   shape: new CANNON.Box(new CANNON.Vec3(500 ,500 , 0.1)),
-//   type: CANNON.Body.STATIC,//static is the same as setting mass to 0
-//   material: groundPhysMat
-// })
-// world.addBody(groundBody)
-// groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0) 
-
-// // ---------------------------------box
-
-// const boxPhysMat = new CANNON.Material()
+// const boxPhysicsMat = new CANNON.Material()
 
 // const boxBody = new CANNON.Body({
-//   mass: 1,
-//   shape: new CANNON.Box(new CANNON.Vec3(1,1,1)),
-//   position: new CANNON.Vec3(1, 20, 0),
-//   material: boxPhysMat
+//   mass: 0,
+//   shape: new CANNON.Box(new CANNON.Vec3(1, 1, 1)),
+//   position: new CANNON.Vec3(1, 1, 0),
+//   material: boxPhysicsMat,
+// });
+// world.addBody(boxBody);
+
+// // Disable collision between cameraBody and boxBody
+
+
+
+// //----------------------Camera --------
+
+// const cameraPhysicsMat = new CANNON.Material()
+
+// const cameraBody = new CANNON.Body({
+//   mass:1,
+//   shape: new CANNON.Sphere(2),
+//   material: cameraPhysicsMat
 // })
-// world.addBody(boxBody)
+// world.addBody(cameraBody)
+// cameraBody.position.set(0,0,10)
 
-// boxBody.angularVelocity.set(0 ,10 ,0)
-// boxBody.angularDamping = 0.5
+// const cameraBoxContactMat = new CANNON.ContactMaterial(
+//   cameraPhysicsMat,
+//   boxPhysicsMat,
+//   { friction: 0.0, restitution: 0.0 }
+// );
+// world.addContactMaterial(cameraBoxContactMat);
 
-// const groundBoxContactMat = new CANNON.ContactMaterial(
-//   groundPhysMat,
-//   boxPhysMat,
-//   {friction : 10}
-//   )
-  
-//   world.addContactMaterial(groundBoxContactMat)
+// const cameraBoxDistanceConstraint = new CANNON.DistanceConstraint(
+//   boxBody,
+//   cameraBody,
+//   0,
+//   0
+// );
+// world.addConstraint(cameraBoxDistanceConstraint);
 
-// const groundCameraContactMat = new CANNON.ContactMaterial(
-//   groundPhysMat,
-//   cameraPhyMat,
-//   {restitution : 0.9}
-// )
 
-// world.addContactMaterial(groundCameraContactMat)
+// cameraBody.collisionFilterGroup = 1;   // Group 1 for cameraBody
+// cameraBody.collisionFilterMask = 2;    // Collide with objects in group 2
+// boxBody.collisionFilterGroup = 2;      // Group 2 for boxBody
+// boxBody.collisionFilterMask = 0;
 
+
+// // ----------Animation loop----------
 
 // const timeStep = 1/60.0
 
-
 // function animate() {
-//   world.step(timeStep)
+//   // Step the physics simulation
+//   world.step(timeStep);
 
-//   // controls.update(); // Update the controls
-//   // camera.position.copy(controls.getObject().position);
-//   // camera.quaternion.copy(controls.getObject().quaternion);
-  
 //   cameraBody.position.copy(controls.getObject().position);
 //   cameraBody.quaternion.copy(controls.getObject().quaternion);
 
@@ -163,24 +157,24 @@
 //   camera.position.copy(cameraBody.position);
 //   camera.quaternion.copy(cameraBody.quaternion);
 
-//   // camera.position.copy(cameraBody.position)
-//   // camera.quaternion.copy(cameraBody.quaternion)
+//   // Update the position and rotation of the plane mesh based on the plane body
+//   plane.position.copy(planeBody.position);
+//   plane.quaternion.copy(planeBody.quaternion);
 
-//   plane.position.copy(groundBody.position)
-//   plane.quaternion.copy(groundBody.quaternion)
+//   boxMesh.position.copy(boxBody.position)
+//   boxMesh.quaternion.copy(boxBody.quaternion)
 
-//   box.position.copy(boxBody.position)
-//   box.quaternion.copy(boxBody.quaternion)
+//   // Render the scene
+//   renderer.render(scene, camera);
 
- 
-
-//   renderer.render(scene, camera)
+//   // Request the next animation frame
+//   requestAnimationFrame(animate);
 // }
 
 // renderer.setAnimationLoop(animate)
 
-// window.addEventListener('resize', function() {
-//   camera.aspect = window.innerWidth / this.window.innerHeight
+// window.addEventListener('resize', function(){
+//   camera.aspect = window.innerWidth / window.innerHeight
 //   camera.updateProjectionMatrix()
 //   renderer.setSize(window.innerWidth, window.innerHeight)
 // })

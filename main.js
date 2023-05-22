@@ -36,6 +36,25 @@ document.body.addEventListener('click', () => {
   controls.lock();
 });
 
+function checkCollisionForMove(object, direction, amount) {
+  // Calculate the target position based on the movement amount and direction
+  const targetPosition = object.position.clone().add(direction.clone().multiplyScalar(amount));
+
+  // Perform collision detection by casting a ray from the object's current position to the target position
+  const raycaster = new THREE.Raycaster(object.position, direction);
+  const intersects = raycaster.intersectObjects(scene.children, true);
+
+  // Check if any intersection occurs and determine if the target position is obstructed
+  for (let i = 0; i < intersects.length; i++) {
+    const intersection = intersects[i];
+    if (intersection.object !== object) {
+      return true; // Collision detected, movement is blocked
+    }
+  }
+
+  return false; // No collision detected, movement is allowed
+}
+
 // Event listener to handle mouse movements and update camera rotation
 document.addEventListener('mousemove', (event) => {
   if (controls.isLocked) {
@@ -47,25 +66,66 @@ document.addEventListener('mousemove', (event) => {
   }
 });
 
-function handleKeyDown(event) {
-  // Handle keyboard controls for movement
+let moveForward = false;
+let moveBackward = false;
+let moveLeft = false;
+let moveRight = false;
+
+// Event listeners to handle keydown and keyup events for movement
+document.addEventListener('keydown', (event) => {
   switch (event.code) {
     case 'KeyW':
-      controls.moveForward(1);
+      moveForward = true;
       break;
     case 'KeyS':
-      controls.moveForward(-1);
+      moveBackward = true;
       break;
     case 'KeyA':
-      controls.moveRight(-1);
+      moveLeft = true;
       break;
     case 'KeyD':
-      controls.moveRight(1);
+      moveRight = true;
       break;
+  }
+});
+
+document.addEventListener('keyup', (event) => {
+  switch (event.code) {
+    case 'KeyW':
+      moveForward = false;
+      break;
+    case 'KeyS':
+      moveBackward = false;
+      break;
+    case 'KeyA':
+      moveLeft = false;
+      break;
+    case 'KeyD':
+      moveRight = false;
+      break;
+  }
+});
+
+function updateMovement() {
+  const movementSpeed = 0.001; // Adjust the movement speed as needed
+
+  // Update the position of the controls object based on the keyboard input
+  if (moveForward && !checkCollisionForMove(camera, camera.getWorldDirection(new THREE.Vector3()), movementSpeed)) {
+    controls.moveForward(movementSpeed);
+  }
+  if (moveBackward && !checkCollisionForMove(camera, camera.getWorldDirection(new THREE.Vector3()).negate(), movementSpeed)) {
+    controls.moveForward(-movementSpeed);
+  }
+  if (moveLeft && !checkCollisionForMove(camera, camera.getWorldDirection(new THREE.Vector3()).cross(new THREE.Vector3(0, 1, 0)), movementSpeed)) {
+    controls.moveRight(-movementSpeed);
+  }
+  if (moveRight && !checkCollisionForMove(camera, camera.getWorldDirection(new THREE.Vector3()).cross(new THREE.Vector3(0, -1, 0)), movementSpeed)) {
+    controls.moveRight(movementSpeed);
   }
 }
 
-document.addEventListener('keydown', handleKeyDown);
+
+
 
 
 // ------------------Plane --------------
@@ -97,9 +157,9 @@ scene.add(boxMesh)
 const boxPhysicsMat = new CANNON.Material()
 
 const boxBody = new CANNON.Body({
-  mass: 0,
+  mass: 1,
   shape: new CANNON.Box(new CANNON.Vec3(1, 1, 1)),
-  position: new CANNON.Vec3(1, 1, 0),
+  position: new CANNON.Vec3(1, 2, 0),
   material: boxPhysicsMat,
 });
 world.addBody(boxBody);
@@ -131,15 +191,15 @@ const cameraBoxDistanceConstraint = new CANNON.DistanceConstraint(
   boxBody,
   cameraBody,
   0,
-  0
+  1
 );
 world.addConstraint(cameraBoxDistanceConstraint);
 
 
-cameraBody.collisionFilterGroup = 1;   // Group 1 for cameraBody
-cameraBody.collisionFilterMask = 2;    // Collide with objects in group 2
-boxBody.collisionFilterGroup = 2;      // Group 2 for boxBody
-boxBody.collisionFilterMask = 0;
+// cameraBody.collisionFilterGroup = 1;   // Group 1 for cameraBody
+// cameraBody.collisionFilterMask = 2;    // Collide with objects in group 2
+// boxBody.collisionFilterGroup = 2;      // Group 2 for boxBody
+// boxBody.collisionFilterMask = 0;
 
 
 // ----------Animation loop----------
@@ -149,13 +209,14 @@ const timeStep = 1/60.0
 function animate() {
   // Step the physics simulation
   world.step(timeStep);
+  updateMovement();
 
   cameraBody.position.copy(controls.getObject().position);
   cameraBody.quaternion.copy(controls.getObject().quaternion);
 
 
-  camera.position.copy(cameraBody.position);
-  camera.quaternion.copy(cameraBody.quaternion);
+  // camera.position.copy(cameraBody.position);
+  // camera.quaternion.copy(cameraBody.quaternion);
 
   // Update the position and rotation of the plane mesh based on the plane body
   plane.position.copy(planeBody.position);
