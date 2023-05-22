@@ -7,235 +7,144 @@ import * as CANNON from 'cannon-es'
 
 
 // --------------Three Js setup ----------------
-const renderer = new THREE.WebGLRenderer()
-renderer.setSize(window.innerWidth, window.innerHeight)
-document.body.appendChild(renderer.domElement)
+const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
 
-const scene = new THREE.Scene()
+      // Create a plane as the ground
+      const planeGeometry = new THREE.PlaneGeometry(10, 10);
+      const planeMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, side: THREE.DoubleSide });
+      const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+      plane.rotation.x = Math.PI / 2;
+      scene.add(plane);
 
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000 )
+      // Create a box as a wall
+      const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
+      const boxMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+      const box = new THREE.Mesh(boxGeometry, boxMaterial);
+      box.position.y = 0.5;
+      scene.add(box);
 
-// const orbit = new OrbitControls(camera, renderer.domElement)
+      // Set up physics world
+      const world = new CANNON.World();
+      world.gravity.set(0, -9.82, 0);
 
-camera.position.set(0, 2, 10)
-// orbit.update()
+      // Add ground plane as a static body
+      const groundShape = new CANNON.Plane();
+      const groundBody = new CANNON.Body({ mass: 0 });
+      groundBody.addShape(groundShape);
+      world.addBody(groundBody);
 
-//  Cannon Declaration the rest of the asset building will be with its three js counter part
-const world = new CANNON.World({
-  gravity: new CANNON.Vec3(0, -9.81, 0)
-})
+      // Add box as a static body
+      const boxShape = new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.5));
+      const boxBody = new CANNON.Body({ mass: 0 });
+      boxBody.addShape(boxShape);
+      boxBody.position.y = 0.5;
+      world.addBody(boxBody);
 
+      // Add camera as a dynamic body
+      const cameraShape = new CANNON.Sphere(0.25);
+      const cameraBody = new CANNON.Body({ mass: 1 });
+      cameraBody.addShape(cameraShape);
+      cameraBody.position.y = 1;
+      world.addBody(cameraBody);
 
-// --------Controls -----------
+      // Enable keyboard controls for camera movement
+      const keyboard = {};
+      const moveSpeed = 0.1;
 
-const controls = new PointerLockControls(camera, document.body);
-scene.add(controls.getObject());
+      function handleKeyDown(event) {
+        keyboard[event.code] = true;
+      }
 
-// Event listener to start the pointer lock when user clicks the scene
-document.body.addEventListener('click', () => {
-  controls.lock();
-});
+      function handleKeyUp(event) {
+        keyboard[event.code] = false;
+      }
 
-function checkCollisionForMove(object, direction, amount) {
-  // Calculate the target position based on the movement amount and direction
-  const targetPosition = object.position.clone().add(direction.clone().multiplyScalar(amount));
+      document.addEventListener('keydown', handleKeyDown);
+      document.addEventListener('keyup', handleKeyUp);
 
-  // Perform collision detection by casting a ray from the object's current position to the target position
-  const raycaster = new THREE.Raycaster(object.position, direction);
-  const intersects = raycaster.intersectObjects(scene.children, true);
+      // Pointer lock controls for camera look
+      const controls = {
+        pitch: 0,
+        yaw: 0
+      };
 
-  // Check if any intersection occurs and determine if the target position is obstructed
-  for (let i = 0; i < intersects.length; i++) {
-    const intersection = intersects[i];
-    if (intersection.object !== object) {
-      return true; // Collision detected, movement is blocked
-    }
-  }
+      function handleMouseMove(event) {
+        controls.yaw -= event.movementX * 0.002;
+        controls.pitch -= event.movementY * 0.002;
+        controls.pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, controls.pitch));
+      }
 
-  return false; // No collision detected, movement is allowed
-}
+      function lockPointer() {
+        renderer.domElement.requestPointerLock();
+      }
 
-// Event listener to handle mouse movements and update camera rotation
-document.addEventListener('mousemove', (event) => {
-  if (controls.isLocked) {
-    const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
-    const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('click', lockPointer);
 
-    // Update camera rotation based on mouse movements
-    controls.updateRotation(movementX, movementY);
-  }
-});
+      // Animation loop
+      function animate() {
+        requestAnimationFrame(animate);
 
-let moveForward = false;
-let moveBackward = false;
-let moveLeft = false;
-let moveRight = false;
+        // Move camera based on keyboard input
+        const moveDirection = new THREE.Vector3();
+        if (keyboard['ArrowUp'] || keyboard['KeyW']) {
+          moveDirection.z = -1;
+        }
+        if (keyboard['ArrowDown'] || keyboard['KeyS']) {
+          moveDirection.z = 1;
+        }
+        if (keyboard['ArrowLeft'] || keyboard['KeyA']) {
+          moveDirection.x = -1;
+        }
+        if (keyboard['ArrowRight'] || keyboard['KeyD']) {
+          moveDirection.x = 1;
+        }
+        moveDirection.normalize();
+        moveDirection.applyQuaternion(camera.quaternion);
 
-// Event listeners to handle keydown and keyup events for movement
-document.addEventListener('keydown', (event) => {
-  switch (event.code) {
-    case 'KeyW':
-      moveForward = true;
-      break;
-    case 'KeyS':
-      moveBackward = true;
-      break;
-    case 'KeyA':
-      moveLeft = true;
-      break;
-    case 'KeyD':
-      moveRight = true;
-      break;
-  }
-});
+        const velocity = moveDirection.multiplyScalar(moveSpeed);
+        cameraBody.velocity.x = velocity.x;
+        cameraBody.velocity.z = velocity.z;
 
-document.addEventListener('keyup', (event) => {
-  switch (event.code) {
-    case 'KeyW':
-      moveForward = false;
-      break;
-    case 'KeyS':
-      moveBackward = false;
-      break;
-    case 'KeyA':
-      moveLeft = false;
-      break;
-    case 'KeyD':
-      moveRight = false;
-      break;
-  }
-});
+        // Prevent camera from falling through the plane
+        const minY = 0.5;
+        if (cameraBody.position.y < minY) {
+          cameraBody.position.y = minY;
+          cameraBody.velocity.y = 0;
+        }
 
-function updateMovement() {
-  const movementSpeed = 0.001; // Adjust the movement speed as needed
+        // Check collision between camera and box
+        const sweepSphere = new CANNON.Sphere(0.25);
+        const sweepDirection = cameraBody.velocity.clone();
+        const result = new CANNON.RaycastResult();
+        world.raycastClosest(cameraBody.position, cameraBody.position.clone().add(sweepDirection), { skipBackfaces: true }, result);
 
-  // Update the position of the controls object based on the keyboard input
-  if (moveForward && !checkCollisionForMove(camera, camera.getWorldDirection(new THREE.Vector3()), movementSpeed)) {
-    controls.moveForward(movementSpeed);
-  }
-  if (moveBackward && !checkCollisionForMove(camera, camera.getWorldDirection(new THREE.Vector3()).negate(), movementSpeed)) {
-    controls.moveForward(-movementSpeed);
-  }
-  if (moveLeft && !checkCollisionForMove(camera, camera.getWorldDirection(new THREE.Vector3()).cross(new THREE.Vector3(0, 1, 0)), movementSpeed)) {
-    controls.moveRight(-movementSpeed);
-  }
-  if (moveRight && !checkCollisionForMove(camera, camera.getWorldDirection(new THREE.Vector3()).cross(new THREE.Vector3(0, -1, 0)), movementSpeed)) {
-    controls.moveRight(movementSpeed);
-  }
-}
+        if (result.hasHit) {
+          const distance = result.distance;
+          if (distance < 0.35) {
+            const separation = 0.35 - distance;
+            const separationVector = result.normal.scale(separation);
+            cameraBody.position.add(separationVector);
+          }
+        }
 
+        // Apply rotation to camera
+        camera.rotation.order = 'YXZ';
+        camera.rotation.y = controls.yaw;
+        camera.rotation.x = controls.pitch;
 
+        // Update physics simulation
+        world.step(1 / 60);
 
+        // Update camera position
+        camera.position.copy(cameraBody.position);
 
+        // Render the scene
+        renderer.render(scene, camera);
+      }
 
-// ------------------Plane --------------
-
-const planeGeometry = new THREE.PlaneGeometry(30, 30)
-const planeMaterial = new THREE.MeshBasicMaterial({ color : 0xFFFFFF})
-const plane = new THREE.Mesh(planeGeometry, planeMaterial)
-scene.add(plane)
-plane.rotation.x = -0.5* Math.PI
-
-const planePhysicsMat = new CANNON.Material()
-const planeBody = new CANNON.Body({
-  shape: new CANNON.Plane(),
-  mass: 0,
-  material: planePhysicsMat
-})
-world.addBody(planeBody)
-planeBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0) 
-
-// ----------------------Box -------------------
-
-const boxGeo = new THREE.BoxGeometry(2 ,2 ,2)
-const boxMat = new THREE.MeshBasicMaterial({
-  color: 0x00ff00,
-})
-const boxMesh = new THREE.Mesh(boxGeo, boxMat)
-scene.add(boxMesh)
-
-const boxPhysicsMat = new CANNON.Material()
-
-const boxBody = new CANNON.Body({
-  mass: 1,
-  shape: new CANNON.Box(new CANNON.Vec3(1, 1, 1)),
-  position: new CANNON.Vec3(1, 2, 0),
-  material: boxPhysicsMat,
-});
-world.addBody(boxBody);
-
-// Disable collision between cameraBody and boxBody
-
-
-
-//----------------------Camera --------
-
-const cameraPhysicsMat = new CANNON.Material()
-
-const cameraBody = new CANNON.Body({
-  mass:1,
-  shape: new CANNON.Sphere(2),
-  material: cameraPhysicsMat
-})
-world.addBody(cameraBody)
-cameraBody.position.set(0,0,10)
-
-const cameraBoxContactMat = new CANNON.ContactMaterial(
-  cameraPhysicsMat,
-  boxPhysicsMat,
-  { friction: 0.0, restitution: 0.0 }
-);
-world.addContactMaterial(cameraBoxContactMat);
-
-const cameraBoxDistanceConstraint = new CANNON.DistanceConstraint(
-  boxBody,
-  cameraBody,
-  0,
-  1
-);
-world.addConstraint(cameraBoxDistanceConstraint);
-
-
-// cameraBody.collisionFilterGroup = 1;   // Group 1 for cameraBody
-// cameraBody.collisionFilterMask = 2;    // Collide with objects in group 2
-// boxBody.collisionFilterGroup = 2;      // Group 2 for boxBody
-// boxBody.collisionFilterMask = 0;
-
-
-// ----------Animation loop----------
-
-const timeStep = 1/60.0
-
-function animate() {
-  // Step the physics simulation
-  world.step(timeStep);
-  updateMovement();
-
-  cameraBody.position.copy(controls.getObject().position);
-  cameraBody.quaternion.copy(controls.getObject().quaternion);
-
-
-  // camera.position.copy(cameraBody.position);
-  // camera.quaternion.copy(cameraBody.quaternion);
-
-  // Update the position and rotation of the plane mesh based on the plane body
-  plane.position.copy(planeBody.position);
-  plane.quaternion.copy(planeBody.quaternion);
-
-  boxMesh.position.copy(boxBody.position)
-  boxMesh.quaternion.copy(boxBody.quaternion)
-
-  // Render the scene
-  renderer.render(scene, camera);
-
-  // Request the next animation frame
-  requestAnimationFrame(animate);
-}
-
-renderer.setAnimationLoop(animate)
-
-window.addEventListener('resize', function(){
-  camera.aspect = window.innerWidth / window.innerHeight
-  camera.updateProjectionMatrix()
-  renderer.setSize(window.innerWidth, window.innerHeight)
-})
+      animate();

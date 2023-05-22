@@ -178,3 +178,11 @@
 //   camera.updateProjectionMatrix()
 //   renderer.setSize(window.innerWidth, window.innerHeight)
 // })
+
+
+
+
+
+
+
+// -------------------------Movement working, and box wall working -------------
