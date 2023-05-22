@@ -38,7 +38,7 @@ const defaultContactMaterial = new CANNON.ContactMaterial(
   defaultMaterial,
   {
     friction: 0.1,
-    restitution: 0.7
+    restitution: 0
   }
 )
 world.addContactMaterial(defaultContactMaterial)
@@ -111,7 +111,7 @@ const objectsToUpdate = []
 const createSphere = (radius, position) => {
   // threejs mesh
   const mesh = new THREE.Mesh(
-    new THREE.SphereBufferGeometry(radius, 20, 20),
+    new THREE.SphereBufferGeometry(radius),
     new THREE.MeshStandardMaterial({
       metalness: 0.3,
       roughness: 0.4,
@@ -142,9 +142,43 @@ const createSphere = (radius, position) => {
 
 // createSphere(0.5, {x: 0, y: 3, z: 0})
 
-function createMaze() {
-  // Array representing the maze layout
 
+// create box's
+const boxGeometry = new THREE.BoxBufferGeometry(1, 1, 1)
+const boxMaterial = new THREE.MeshStandardMaterial({
+  metalness:0.3,
+  roughness: 0.4
+})
+
+
+const createBox = (width, height, depth, position) => {
+  // threejs mesh
+  const mesh = new THREE.Mesh(boxGeometry, boxMaterial);
+  mesh.scale.set(width, height, depth);
+  mesh.castShadow = true;
+  mesh.position.copy(position);
+  scene.add(mesh);
+
+  // cannon shapes
+  const shape = new CANNON.Box(new CANNON.Vec3(width / 2, height / 2, depth / 2));
+  const body = new CANNON.Body({
+    mass: 1,
+    position: new CANNON.Vec3(0, 0, 0),
+    shape: shape,
+    material: new CANNON.Material() // Using CANNON.Material directly
+  });
+  body.position.copy(position);
+  world.addBody(body);
+
+  // save in objects to update
+  objectsToUpdate.push({
+    mesh: mesh,
+    body: body
+  });
+};
+
+function createMaze() {
+  
   // Dimensions of the maze
   const numRows = maze.length;
   const numCols = maze[0].length;
@@ -152,23 +186,55 @@ function createMaze() {
   // Size of each cell in the maze
   const cellSize = 2;
 
-  // Starting position of the maze
-  const startX = -((numCols - 1) * cellSize) / 2;
-  const startZ = -((numRows - 1) * cellSize) / 2;
+  // Calculate the adjusted spacing between each box
+  const adjustedSpacing = (cellSize - 0.5) / 2;
 
-  // Create spheres based on maze layout
+  // Starting position of the maze
+  const startX = -((numCols - 1) * cellSize) / 2 + adjustedSpacing;
+  const startZ = -((numRows - 1) * cellSize) / 2 + adjustedSpacing;
+
+  // Create boxes based on maze layout
   for (let row = 0; row < numRows; row++) {
     for (let col = 0; col < numCols; col++) {
       if (maze[row][col] === 0) {
         const positionX = startX + col * cellSize;
         const positionZ = startZ + row * cellSize;
-        createSphere(0.5, { x: positionX, y: 0, z: positionZ });
+        createBox(1.9, 2, 1.9, { x: positionX, y: 0, z: positionZ });
       }
     }
   }
 }
 
-createMaze()
+createMaze();
+
+
+// function createMaze() {
+//   // Array representing the maze layout
+
+//   // Dimensions of the maze
+//   const numRows = maze.length;
+//   const numCols = maze[0].length;
+
+//   // Size of each cell in the maze
+//   const cellSize = 2;
+
+//   // Starting position of the maze
+//   const startX = -((numCols - 1) * cellSize) / 2;
+//   const startZ = -((numRows - 1) * cellSize) / 2;
+
+//   // Create spheres based on maze layout
+//   for (let row = 0; row < numRows; row++) {
+//     for (let col = 0; col < numCols; col++) {
+//       if (maze[row][col] === 0) {
+//         const positionX = startX + col * cellSize;
+//         const positionZ = startZ + row * cellSize;
+//         createSphere(0.5, { x: positionX, y: 0, z: positionZ });
+//       }
+//     }
+//   }
+// }
+
+// createMaze()
 
 const clock = new THREE.Clock()
 let oldElapsedTIme = 0
