@@ -186,3 +186,26 @@
 
 
 // -------------------------Movement working, and box wall working -------------
+
+//  this might work for map generation
+
+// create the walls of the maze
+// for (let z = 0; z < mazeArray.length; z++) {
+//     for (let x = 0; x < mazeArray[z].length; x++) {
+//         if (mazeArray[z][x] === 1) {
+//             // create a wall
+//             const wallGeometry = new THREE.BoxGeometry(1, 1, 1);
+//             const wallMaterial = new THREE.MeshBasicMaterial({color: 0x00ff00});
+//             const wall = new THREE.Mesh(wallGeometry, wallMaterial);
+//             scene.add(wall);
+//             wall.position.set(x, 0.5, z);
+
+//             // create a wall physics body
+//             const wallShape = new Box(new Vec3(0.5, 0.5, 0.5));
+//             const wallBody = new Body({ mass: 0 }); // walls are static
+//             wallBody.addShape(wallShape);
+//             wallBody.position.set(x, 0.5, z);
+//             world.addBody(wallBody);
+//         }
+//     }
+// }
