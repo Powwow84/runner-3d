@@ -97,12 +97,15 @@ scene.add(boxMesh)
 const boxPhysicsMat = new CANNON.Material()
 
 const boxBody = new CANNON.Body({
-  mass: 10,
+  mass: 0,
   shape: new CANNON.Box(new CANNON.Vec3(1, 1, 1)),
-  position: new CANNON.Vec3(1, 10, 0),
-  material: boxPhysicsMat
-})
-world.addBody(boxBody)
+  position: new CANNON.Vec3(1, 1, 0),
+  material: boxPhysicsMat,
+});
+world.addBody(boxBody);
+
+// Disable collision between cameraBody and boxBody
+
 
 
 //----------------------Camera --------
@@ -125,13 +128,18 @@ const cameraBoxContactMat = new CANNON.ContactMaterial(
 world.addContactMaterial(cameraBoxContactMat);
 
 const cameraBoxDistanceConstraint = new CANNON.DistanceConstraint(
-  cameraBody,
   boxBody,
+  cameraBody,
   0,
-  2
+  0
 );
 world.addConstraint(cameraBoxDistanceConstraint);
 
+
+cameraBody.collisionFilterGroup = 1;   // Group 1 for cameraBody
+cameraBody.collisionFilterMask = 2;    // Collide with objects in group 2
+boxBody.collisionFilterGroup = 2;      // Group 2 for boxBody
+boxBody.collisionFilterMask = 0;
 
 
 // ----------Animation loop----------
