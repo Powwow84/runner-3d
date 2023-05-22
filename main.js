@@ -97,7 +97,7 @@ scene.add(boxMesh)
 const boxPhysicsMat = new CANNON.Material()
 
 const boxBody = new CANNON.Body({
-  mass: 1,
+  mass: 10,
   shape: new CANNON.Box(new CANNON.Vec3(1, 1, 1)),
   position: new CANNON.Vec3(1, 10, 0),
   material: boxPhysicsMat
@@ -117,9 +117,20 @@ const cameraBody = new CANNON.Body({
 world.addBody(cameraBody)
 cameraBody.position.set(0,0,10)
 
+const cameraBoxContactMat = new CANNON.ContactMaterial(
+  cameraPhysicsMat,
+  boxPhysicsMat,
+  { friction: 0.0, restitution: 0.0 }
+);
+world.addContactMaterial(cameraBoxContactMat);
 
-
-
+const cameraBoxDistanceConstraint = new CANNON.DistanceConstraint(
+  cameraBody,
+  boxBody,
+  0,
+  2
+);
+world.addConstraint(cameraBoxDistanceConstraint);
 
 
 
