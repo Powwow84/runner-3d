@@ -22,15 +22,22 @@ const scene = new THREE.Scene();
 // Add OrbitControls
 const controls = new OrbitControls(camera, renderer.domElement);
 
-// -------------------------------------------------------------
+// ----------------------------Files---------------------------------
 
+const bgMusic = new Audio('public/music/tunetank.com_5196_secrets-of-the-house-on-the-hill_by_rage-sound.mp3')
+const sfx = new Audio('public/music/661499__het_hckm_ds_huis__mortality-boring-death-dying-clock-tick-tock-klok-tik-tak-incl-20-hertz-sometimes-02-01.mp3')
+// bgMusic.play()
+
+const playSfx = () => 
+{
+  sfx.play
+}
 // --------------Cannon ES Set up ----------------------------
 
 const world = new CANNON.World()
+world.broadphase = new CANNON.SAPBroadphase(world)
+world.allowsleep = true
 world.gravity.set(0, -9.82, 0)
-
-// const concreteMaterial = new CANNON.Material('concrete')
-// const plasticMaterial = new CANNON.Material('plastic')
 
 const defaultMaterial = new CANNON.Material('default')
 const defaultContactMaterial = new CANNON.ContactMaterial(
@@ -44,15 +51,6 @@ const defaultContactMaterial = new CANNON.ContactMaterial(
 world.addContactMaterial(defaultContactMaterial)
 world.defaultContactMaterial = defaultContactMaterial
 
-// const concretePlasticContactMaterial = new CANNON.ContactMaterial(
-//   concreteMaterial,
-//   plasticMaterial,
-//   {
-//     friction: 0.1,
-//     restitution: 1
-//   }
-// )
-// world.addContactMaterial(concretePlasticContactMaterial)
 
 // Create a plane
 const planeGeometry = new THREE.PlaneGeometry(10, 10);
@@ -64,7 +62,6 @@ planeMesh.rotation.x = -0.5* Math.PI
 
 const floorShape = new CANNON.Plane()
 const floorBody = new CANNON.Body()
-// floorBody.material = defaultContactMaterial
 floorBody.mass = 0
 floorBody.addShape(floorShape)
 floorBody.quaternion.setFromAxisAngle(
@@ -72,25 +69,6 @@ floorBody.quaternion.setFromAxisAngle(
   Math.PI * .5
 )
 world.addBody(floorBody)
-
-// Create a sphere
-// const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
-// const sphereMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000 });
-// const sphereMesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
-// sphereMesh.position.set(0, 1, 0);
-// sphereMesh.castShadow = true; // Enable shadow casting from the sphere
-// scene.add(sphereMesh);
-
-// const sphereShape = new CANNON.Sphere(1)
-// const sphereBody = new CANNON.Body({
-//   mass: 1,
-//   position: new CANNON.Vec3(0, 10, 0),
-//   shape: sphereShape,
-//   // material: defaultContactMaterial
-// })
-// sphereBody.applyLocalForce(new CANNON.Vec3(150, 0, 0), new CANNON.Vec3(0, 0, 0))
-// world.addBody(sphereBody)
-
 
 
 // Create lighting
@@ -107,44 +85,8 @@ scene.add(directionalLight);
 
 const objectsToUpdate = []
 
-
-const createSphere = (radius, position) => {
-  // threejs mesh
-  const mesh = new THREE.Mesh(
-    new THREE.SphereBufferGeometry(radius),
-    new THREE.MeshStandardMaterial({
-      metalness: 0.3,
-      roughness: 0.4,
-      // envMap: environmentMapTexture
-    })
-  )
-  mesh.castShadow = true
-  mesh.position.copy(position)
-  scene.add(mesh)
-
-  //  cannon shapes
-  const shape = new CANNON.Sphere(radius)
-  const body = new CANNON.Body({
-    mass: 1,
-    position: new CANNON.Vec3(0, 3, 0),
-    shape: shape,
-    material: defaultMaterial
-  })
-  body.position.copy(position)
-  world.addBody(body)
-
-  // save in objects to update
-  objectsToUpdate.push({
-    mesh: mesh,
-    body: body
-  })
-}
-
-// createSphere(0.5, {x: 0, y: 3, z: 0})
-
-
 // create box's
-const boxGeometry = new THREE.BoxBufferGeometry(1, 1, 1)
+const boxGeometry = new THREE.BoxGeometry(1, 1, 1)
 const boxMaterial = new THREE.MeshStandardMaterial({
   metalness:0.3,
   roughness: 0.4
@@ -168,6 +110,7 @@ const createBox = (width, height, depth, position) => {
     material: new CANNON.Material() // Using CANNON.Material directly
   });
   body.position.copy(position);
+  // body.addEventListener('collide', playSfx) example to use when we are doing the win condition
   world.addBody(body);
 
   // save in objects to update
@@ -178,7 +121,6 @@ const createBox = (width, height, depth, position) => {
 };
 
 function createMaze() {
-  
   // Dimensions of the maze
   const numRows = maze.length;
   const numCols = maze[0].length;
@@ -196,7 +138,7 @@ function createMaze() {
   // Create boxes based on maze layout
   for (let row = 0; row < numRows; row++) {
     for (let col = 0; col < numCols; col++) {
-      if (maze[row][col] === 0) {
+      if (maze[row][col] === 1) { // Flip condition from 0 to 1
         const positionX = startX + col * cellSize;
         const positionZ = startZ + row * cellSize;
         createBox(1.9, 2, 1.9, { x: positionX, y: 0, z: positionZ });
@@ -207,34 +149,6 @@ function createMaze() {
 
 createMaze();
 
-
-// function createMaze() {
-//   // Array representing the maze layout
-
-//   // Dimensions of the maze
-//   const numRows = maze.length;
-//   const numCols = maze[0].length;
-
-//   // Size of each cell in the maze
-//   const cellSize = 2;
-
-//   // Starting position of the maze
-//   const startX = -((numCols - 1) * cellSize) / 2;
-//   const startZ = -((numRows - 1) * cellSize) / 2;
-
-//   // Create spheres based on maze layout
-//   for (let row = 0; row < numRows; row++) {
-//     for (let col = 0; col < numCols; col++) {
-//       if (maze[row][col] === 0) {
-//         const positionX = startX + col * cellSize;
-//         const positionZ = startZ + row * cellSize;
-//         createSphere(0.5, { x: positionX, y: 0, z: positionZ });
-//       }
-//     }
-//   }
-// }
-
-// createMaze()
 
 const clock = new THREE.Clock()
 let oldElapsedTIme = 0
