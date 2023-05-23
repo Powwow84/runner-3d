@@ -39,6 +39,10 @@ const world = new CANNON.World()
 // world.allowsleep = true
 world.gravity.set(0, -9.82, 0)
 
+
+// ------------Texture loaders --------------
+const textureLoader = new THREE.TextureLoader()
+
 // ---------------------Generate default material-----
 
 const defaultMaterial = new CANNON.Material('default')
@@ -46,8 +50,8 @@ const defaultContactMaterial = new CANNON.ContactMaterial(
   defaultMaterial,
   defaultMaterial,
   {
-    friction: 0.005,
-    restitution: 0
+    friction: 0.009,
+    restitution: .5
   }
 )
 world.addContactMaterial(defaultContactMaterial)
@@ -56,7 +60,7 @@ world.defaultContactMaterial = defaultContactMaterial
 // ----------------Creating a camera and body---------------
 const cameraBody = new CANNON.Body({
   mass: 1,
-  shape: new CANNON.Box(new CANNON.Vec3(.5, .5, .5)),
+  shape: new CANNON.Box(new CANNON.Vec3(.2, .5, .2)),
   fixedRotation: true
   // type: 4
 })
@@ -64,8 +68,9 @@ world.addBody(cameraBody)
 cameraBody.position.set(0, 1, 0)
 
 // Create a plane
-const planeGeometry = new THREE.PlaneGeometry(10, 10);
-const planeMaterial = new THREE.MeshPhongMaterial({ color: 0xeeeeee });
+const planeGeometry = new THREE.PlaneGeometry(130, 100);
+const planeMaterial = new THREE.MeshPhongMaterial({
+  map: textureLoader.load('public/imgs/Untitled design/4.jpg') });
 const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
 planeMesh.receiveShadow = true; // Enable shadow casting on the plane
 scene.add(planeMesh);
@@ -99,8 +104,7 @@ const objectsToUpdate = []
 // create box's
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1)
 const boxMaterial = new THREE.MeshStandardMaterial({
-  metalness:0.3,
-  roughness: 0.1,
+  map: textureLoader.load('public/imgs/Untitled design/AdobeStock_242318067.jpeg') 
 })
 
 
