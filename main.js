@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
+import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js'
 import * as CANNON from 'cannon-es';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import * as dat from 'dat.gui'
@@ -8,177 +8,134 @@ import maze from './mapArray';
 
 // --------------Three Js setup ----------------
 // Set up renderer
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+// Three.js setup
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.shadowMap.enabled = true; // Enable shadow mapping
 document.body.appendChild(renderer.domElement);
 
-// Create a camera
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(0, 20, 10);
-// Create a scene
-const scene = new THREE.Scene();
-
-// Add OrbitControls
-const controls = new OrbitControls(camera, renderer.domElement);
-
-// ----------------------------Files---------------------------------
-
-const bgMusic = new Audio('public/music/tunetank.com_5196_secrets-of-the-house-on-the-hill_by_rage-sound.mp3')
-const sfx = new Audio('public/music/661499__het_hckm_ds_huis__mortality-boring-death-dying-clock-tick-tock-klok-tik-tak-incl-20-hertz-sometimes-02-01.mp3')
-// bgMusic.play()
-
-const playSfx = () => 
-{
-  sfx.play
-}
-// --------------Cannon ES Set up ----------------------------
-
-const world = new CANNON.World()
-world.broadphase = new CANNON.SAPBroadphase(world)
-world.allowsleep = true
-world.gravity.set(0, -9.82, 0)
-
-const defaultMaterial = new CANNON.Material('default')
-const defaultContactMaterial = new CANNON.ContactMaterial(
-  defaultMaterial,
-  defaultMaterial,
-  {
-    friction: 0.1,
-    restitution: 0
-  }
-)
-world.addContactMaterial(defaultContactMaterial)
-world.defaultContactMaterial = defaultContactMaterial
-
+// Cannon.js setup
+const world = new CANNON.World();
+world.gravity.set(0, -9.82, 0);
 
 // Create a plane
 const planeGeometry = new THREE.PlaneGeometry(10, 10);
-const planeMaterial = new THREE.MeshPhongMaterial({ color: 0xeeeeee });
+const planeMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, side: THREE.DoubleSide });
 const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
-planeMesh.receiveShadow = true; // Enable shadow casting on the plane
 scene.add(planeMesh);
-planeMesh.rotation.x = -0.5* Math.PI
 
-const floorShape = new CANNON.Plane()
-const floorBody = new CANNON.Body()
-floorBody.mass = 0
-floorBody.addShape(floorShape)
-floorBody.quaternion.setFromAxisAngle(
-  new CANNON.Vec3(-1, 0, 0),
-  Math.PI * .5
-)
-world.addBody(floorBody)
+const planeShape = new CANNON.Plane();
+const planeBody = new CANNON.Body({ mass: 0 });
+planeBody.addShape(planeShape);
+planeBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
+world.addBody(planeBody);
 
+// Create a box
+const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
+const boxMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+const boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
+scene.add(boxMesh);
 
-// Create lighting
-const ambientLight = new THREE.AmbientLight(0x404040); // Ambient light
-scene.add(ambientLight);
+const boxShape = new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.5));
+const boxBody = new CANNON.Body({ mass: 1 });
+boxBody.addShape(boxShape);
+boxBody.position.set(0, 2, 0);
+world.addBody(boxBody);
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // Directional light
-directionalLight.position.set(0, 10, 0);
-directionalLight.castShadow = true; // Enable shadow casting from the light
-scene.add(directionalLight);
+// Set up controls
+const controls = new THREE.PointerLockControls(camera, document.body);
+scene.add(controls.getObject());
 
+const velocity = new THREE.Vector3();
+const moveForward = new THREE.Vector3();
+const moveRight = new THREE.Vector3();
 
-// ----------------Utilities-----------
-
-const objectsToUpdate = []
-
-// create box's
-const boxGeometry = new THREE.BoxGeometry(1, 1, 1)
-const boxMaterial = new THREE.MeshStandardMaterial({
-  metalness:0.3,
-  roughness: 0.4
-})
-
-
-const createBox = (width, height, depth, position) => {
-  // threejs mesh
-  const mesh = new THREE.Mesh(boxGeometry, boxMaterial);
-  mesh.scale.set(width, height, depth);
-  mesh.castShadow = true;
-  mesh.position.copy(position);
-  scene.add(mesh);
-
-  // cannon shapes
-  const shape = new CANNON.Box(new CANNON.Vec3(width / 2, height / 2, depth / 2));
-  const body = new CANNON.Body({
-    mass: 1,
-    position: new CANNON.Vec3(0, 0, 0),
-    shape: shape,
-    material: new CANNON.Material() // Using CANNON.Material directly
-  });
-  body.position.copy(position);
-  // body.addEventListener('collide', playSfx) example to use when we are doing the win condition
-  world.addBody(body);
-
-  // save in objects to update
-  objectsToUpdate.push({
-    mesh: mesh,
-    body: body
-  });
-};
-
-function createMaze() {
-  // Dimensions of the maze
-  const numRows = maze.length;
-  const numCols = maze[0].length;
-
-  // Size of each cell in the maze
-  const cellSize = 2;
-
-  // Calculate the adjusted spacing between each box
-  const adjustedSpacing = (cellSize - 0.5) / 2;
-
-  // Starting position of the maze
-  const startX = -((numCols - 1) * cellSize) / 2 + adjustedSpacing;
-  const startZ = -((numRows - 1) * cellSize) / 2 + adjustedSpacing;
-
-  // Create boxes based on maze layout
-  for (let row = 0; row < numRows; row++) {
-    for (let col = 0; col < numCols; col++) {
-      if (maze[row][col] === 1) { // Flip condition from 0 to 1
-        const positionX = startX + col * cellSize;
-        const positionZ = startZ + row * cellSize;
-        createBox(1.9, 2, 1.9, { x: positionX, y: 0, z: positionZ });
-      }
-    }
+// Pointer lock setup
+document.addEventListener("keydown", function (event) {
+  if (event.key === "Escape") {
+    controls.unlock();
   }
-}
+});
 
-createMaze();
+document.addEventListener("pointerlockchange", function () {
+  if (document.pointerLockElement === document.body) {
+    controls.enabled = true;
+  } else {
+    controls.enabled = false;
+  }
+});
 
+// Event listeners for movement
+document.addEventListener("keydown", function (event) {
+  if (event.key === "w") {
+    velocity.z -= 0.1;
+  } else if (event.key === "s") {
+    velocity.z += 0.1;
+  } else if (event.key === "a") {
+    velocity.x -= 0.1;
+  } else if (event.key === "d") {
+    velocity.x += 0.1;
+  }
+});
 
-const clock = new THREE.Clock()
-let oldElapsedTIme = 0
+document.addEventListener("keyup", function (event) {
+  if (event.key === "w") {
+    velocity.z = 0;
+  } else if (event.key === "s") {
+    velocity.z = 0;
+  } else if (event.key === "a") {
+    velocity.x = 0;
+  } else if (event.key === "d") {
+    velocity.x = 0;
+  }
+});
 
-// Render loop
+document.addEventListener("mousemove", function (event) {
+  if (document.pointerLockElement === document.body) {
+    const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
+    const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+
+    camera.rotation.y -= movementX * 0.002;
+    camera.rotation.x -= movementY * 0.002;
+
+    camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x));
+  }
+});
+
+// Animation loop
 function animate() {
-
-  const elapsedTime = clock.getElapsedTime()
-  const deltaTime = elapsedTime - oldElapsedTIme
-  oldElapsedTIme = elapsedTime
-
-  // sphereBody.applyForce(new CANNON.Vec3(-.05, 0, 0), sphereBody.position)
-
-  // update physics world
-  world.step(1/60, deltaTime, 3 )
-
-  for(const object of objectsToUpdate) {
-    object.mesh.position.copy(object.body.position)
-  }
-  // sphereMesh.position.copy(sphereBody.position)
-
-
-
-  controls.update()
   requestAnimationFrame(animate);
 
+  // Apply movement
+  if (controls.enabled) {
+    const time = performance.now() * 0.001;
 
+    // Update box position
+    boxBody.position.copy(boxMesh.position);
+    boxBody.quaternion.copy(boxMesh.quaternion);
 
-  
+    // Update camera position
+    velocity.y -= 9.82 * 0.02;
+    controls.getObject().translateX(velocity.x * 0.02);
+    controls.getObject().translateY(velocity.y * 0.02);
+    controls.getObject().translateZ(velocity.z * 0.02);
+
+    const delta = (time - prevTime) * 0.1;
+    velocity.x -= velocity.x * 10.0 * delta;
+    velocity.z -= velocity.z * 10.0 * delta;
+
+    controls.getObject().position.y = Math.max(controls.getObject().position.y, 1);
+
+    prevTime = time;
+  }
+
+  // Step the physics simulation
+  world.step(1 / 60);
+
+  // Render the scene
   renderer.render(scene, camera);
 }
 
+let prevTime = performance.now();
 animate();
