@@ -14,6 +14,9 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true; // Enable shadow mapping
 document.body.appendChild(renderer.domElement);
 
+
+// ----------------Start Screen Scene
+
 const startScreen = () => {
 
   // Create a camera
@@ -26,24 +29,46 @@ const scene = new THREE.Scene();
 // Setup font ---------------------
 const loader = new FontLoader();
 
-loader.load( 'https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function ( font ){
+loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', function ( font ){
 
-	const fontgeometry = new TextGeometry( 'Hello three.js!', {
+	const fontgeometry = new TextGeometry( 'Runner', {
 		font: font,
-		size: 2,
-		height: 0,
+		size: 5,
+		height: 0.3,
 		curveSegments: 12,
 		bevelEnabled: true,
 		bevelThickness: 0,
-		bevelSize: 1,
+		bevelSize: 0,
 		bevelOffset: 0,
-		bevelSegments: 5
+		bevelSegments: 0
 	} );
-  const fontMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+  const fontMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
   
   const textMesh = new THREE.Mesh(fontgeometry, fontMaterial);
   scene.add(textMesh);
-  textMesh.position.set(0, 5, 1);
+  textMesh.position.set(-15, 15.5, 8);
+  textMesh.rotation.x = Math.PI / -2
+} );
+
+loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', function ( font ){
+
+	const fontgeometry = new TextGeometry( '3D', {
+		font: font,
+		size: 5,
+		height: 0,
+		curveSegments: 12,
+		bevelEnabled: true,
+		bevelThickness: 1,
+		bevelSize: 0,
+		bevelOffset: 0,
+		bevelSegments: 1
+	} );
+  const fontMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+  
+  const textMesh = new THREE.Mesh(fontgeometry, fontMaterial);
+  scene.add(textMesh);
+  textMesh.position.set(9, 15, 1);
+  textMesh.rotation.x = 5.5
 } );
 
 
@@ -52,6 +77,18 @@ loader.load( 'https://threejs.org/examples/fonts/helvetiker_regular.typeface.jso
 const orbitControls = new OrbitControls(camera, renderer.domElement);
 orbitControls.update()
 
+// ---------------Start Button ----------------------
+
+const startBox = new THREE.BoxGeometry(3 , .5 ,1)
+const startButtonMaterial = new THREE.MeshStandardMaterial({ color: 0xFFFFFF})
+const startButton = new THREE.Mesh(startBox, startButtonMaterial)
+scene.add(startButton)
+startButton.position.set(0,20,34)
+
+startButton.addEventListener('click', function(event) {
+  // Your event handling code here
+  console.log('Start button clicked!');
+});
 
 
 // -----------------Creating the cube texture for the world environment
@@ -67,7 +104,7 @@ scene.background = cubeTextureLoader.load([
   
 ])
 
-// Create a plane
+// Create a plane-------------------------------------------------
 const planeGeometry = new THREE.PlaneGeometry(130, 100);
 const planeMaterial = new THREE.MeshPhongMaterial({
   map: textureLoader.load('public/imgs/Untitled design/4.jpg') });
@@ -105,19 +142,6 @@ const createBox = (width, height, depth, position) => {
   mesh.castShadow = true;
   mesh.position.copy(position);
   scene.add(mesh);
-
-  // cannon shapes
-  // const shape = new CANNON.Box(new CANNON.Vec3(width / 2, height / 2, depth / 2));
-  // const body = new CANNON.Body({
-  //   mass: 10, //0.000001,
-  //   type: 2,
-  //   position: new CANNON.Vec3(0, 0, 0),
-  //   shape: shape,
-  //   material: new CANNON.Material() // Using CANNON.Material directly
-  // });
-  // body.position.copy(position);
-  // // body.addEventListener('collide', playSfx) example to use when we are doing the win condition
-  // world.addBody(body);
 
   // save in objects to update
   objectsToUpdate.push({
