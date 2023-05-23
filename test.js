@@ -1,211 +1,282 @@
-// import * as THREE from 'three'
-// import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js'
-// import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
-// import * as CANNON from 'cannon-es'
+import * as THREE from 'three';
+import {PointerLockControls} from 'three/examples/jsm/controls/PointerLockControls';
+import * as CANNON from 'cannon-es';
+import maze from './mapArray';
 
 
+// --------------Three Js setup ----------------
+// Set up renderer
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.domElement.requestPointerLock = renderer.domElement.requestPointerLock || renderer.domElement.mozRequestPointerLock;
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true; // Enable shadow mapping
+document.body.appendChild(renderer.domElement);
 
+// Create a camera
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.set(0, 1, 0);
+// Create a scene
+const scene = new THREE.Scene();
 
-// // --------------Three Js setup ----------------
-// const renderer = new THREE.WebGLRenderer()
-// renderer.setSize(window.innerWidth, window.innerHeight)
-// document.body.appendChild(renderer.domElement)
+// Add OrbitControls
+// const orbitControls = new OrbitControls(camera, renderer.domElement);
+// orbitControls.update()
 
-// const scene = new THREE.Scene()
+// ----------------------------Files---------------------------------
 
-// const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000 )
+// const bgMusic = new Audio('public/music/tunetank.com_5196_secrets-of-the-house-on-the-hill_by_rage-sound.mp3')
+// const sfx = new Audio('public/music/661499__het_hckm_ds_huis__mortality-boring-death-dying-clock-tick-tock-klok-tik-tak-incl-20-hertz-sometimes-02-01.mp3')
+// // bgMusic.play()
 
-// // const orbit = new OrbitControls(camera, renderer.domElement)
-
-// camera.position.set(0, 2, 10)
-// // orbit.update()
-
-// //  Cannon Declaration the rest of the asset building will be with its three js counter part
-// const world = new CANNON.World({
-//   gravity: new CANNON.Vec3(0, -9.81, 0)
-// })
-
-
-// // --------Controls -----------
-
-// const controls = new PointerLockControls(camera, document.body);
-// scene.add(controls.getObject());
-
-// // Event listener to start the pointer lock when user clicks the scene
-// document.body.addEventListener('click', () => {
-//   controls.lock();
-// });
-
-// // Event listener to handle mouse movements and update camera rotation
-// document.addEventListener('mousemove', (event) => {
-//   if (controls.isLocked) {
-//     const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
-//     const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
-
-//     // Update camera rotation based on mouse movements
-//     controls.updateRotation(movementX, movementY);
-//   }
-// });
-
-// function handleKeyDown(event) {
-//   // Handle keyboard controls for movement
-//   switch (event.code) {
-//     case 'KeyW':
-//       controls.moveForward(1);
-//       break;
-//     case 'KeyS':
-//       controls.moveForward(-1);
-//       break;
-//     case 'KeyA':
-//       controls.moveRight(-1);
-//       break;
-//     case 'KeyD':
-//       controls.moveRight(1);
-//       break;
-//   }
+// const playSfx = () =>
+// {
+//   sfx.play
 // }
+// --------------Cannon ES Set up ----------------------------
 
-// document.addEventListener('keydown', handleKeyDown);
+const world = new CANNON.World()
+world.broadphase = new CANNON.SAPBroadphase(world)
+world.allowsleep = true
+world.gravity.set(0, -9.82, 0)
 
+// ---------------------Generate default material-----
 
-// // ------------------Plane --------------
+const defaultMaterial = new CANNON.Material('default')
+const defaultContactMaterial = new CANNON.ContactMaterial(
+  defaultMaterial,
+  defaultMaterial,
+  {
+    friction: 0.005,
+    restitution: 0
+  }
+)
+world.addContactMaterial(defaultContactMaterial)
+world.defaultContactMaterial = defaultContactMaterial
 
-// const planeGeometry = new THREE.PlaneGeometry(30, 30)
-// const planeMaterial = new THREE.MeshBasicMaterial({ color : 0xFFFFFF})
-// const plane = new THREE.Mesh(planeGeometry, planeMaterial)
-// scene.add(plane)
-// plane.rotation.x = -0.5* Math.PI
+// ----------------Creating a camera and body---------------
+const cameraBody = new CANNON.Body({
+  mass: 1,
+  shape: new CANNON.Box(new CANNON.Vec3(1, 1, 1)),
+  fixedRotation: true
+  // type: 4
+})
+world.addBody(cameraBody)
+cameraBody.position.set(0, 1, 0)
 
-// const planePhysicsMat = new CANNON.Material()
-// const planeBody = new CANNON.Body({
-//   shape: new CANNON.Plane(),
-//   mass: 0,
-//   material: planePhysicsMat
-// })
-// world.addBody(planeBody)
-// planeBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0) 
+// Create a plane
+const planeGeometry = new THREE.PlaneGeometry(10, 10);
+const planeMaterial = new THREE.MeshPhongMaterial({ color: 0xeeeeee });
+const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
+planeMesh.receiveShadow = true; // Enable shadow casting on the plane
+scene.add(planeMesh);
+planeMesh.rotation.x = -0.5* Math.PI
 
-// // ----------------------Box -------------------
-
-// const boxGeo = new THREE.BoxGeometry(2 ,2 ,2)
-// const boxMat = new THREE.MeshBasicMaterial({
-//   color: 0x00ff00,
-// })
-// const boxMesh = new THREE.Mesh(boxGeo, boxMat)
-// scene.add(boxMesh)
-
-// const boxPhysicsMat = new CANNON.Material()
-
-// const boxBody = new CANNON.Body({
-//   mass: 0,
-//   shape: new CANNON.Box(new CANNON.Vec3(1, 1, 1)),
-//   position: new CANNON.Vec3(1, 1, 0),
-//   material: boxPhysicsMat,
-// });
-// world.addBody(boxBody);
-
-// // Disable collision between cameraBody and boxBody
-
-
-
-// //----------------------Camera --------
-
-// const cameraPhysicsMat = new CANNON.Material()
-
-// const cameraBody = new CANNON.Body({
-//   mass:1,
-//   shape: new CANNON.Sphere(2),
-//   material: cameraPhysicsMat
-// })
-// world.addBody(cameraBody)
-// cameraBody.position.set(0,0,10)
-
-// const cameraBoxContactMat = new CANNON.ContactMaterial(
-//   cameraPhysicsMat,
-//   boxPhysicsMat,
-//   { friction: 0.0, restitution: 0.0 }
-// );
-// world.addContactMaterial(cameraBoxContactMat);
-
-// const cameraBoxDistanceConstraint = new CANNON.DistanceConstraint(
-//   boxBody,
-//   cameraBody,
-//   0,
-//   0
-// );
-// world.addConstraint(cameraBoxDistanceConstraint);
+const floorShape = new CANNON.Plane()
+const floorBody = new CANNON.Body()
+floorBody.mass = 0
+floorBody.addShape(floorShape)
+floorBody.quaternion.setFromAxisAngle(
+  new CANNON.Vec3(-1, 0, 0),
+  Math.PI * .5
+)
+world.addBody(floorBody)
 
 
-// cameraBody.collisionFilterGroup = 1;   // Group 1 for cameraBody
-// cameraBody.collisionFilterMask = 2;    // Collide with objects in group 2
-// boxBody.collisionFilterGroup = 2;      // Group 2 for boxBody
-// boxBody.collisionFilterMask = 0;
+// Create lighting
+const ambientLight = new THREE.AmbientLight(0x404040); // Ambient light
+scene.add(ambientLight);
+
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // Directional light
+directionalLight.position.set(0, 10, 0);
+directionalLight.castShadow = true; // Enable shadow casting from the light
+scene.add(directionalLight);
 
 
-// // ----------Animation loop----------
+// ----------------Utilities-----------
 
-// const timeStep = 1/60.0
+const objectsToUpdate = []
 
-// function animate() {
-//   // Step the physics simulation
-//   world.step(timeStep);
-
-//   cameraBody.position.copy(controls.getObject().position);
-//   cameraBody.quaternion.copy(controls.getObject().quaternion);
-
-
-//   camera.position.copy(cameraBody.position);
-//   camera.quaternion.copy(cameraBody.quaternion);
-
-//   // Update the position and rotation of the plane mesh based on the plane body
-//   plane.position.copy(planeBody.position);
-//   plane.quaternion.copy(planeBody.quaternion);
-
-//   boxMesh.position.copy(boxBody.position)
-//   boxMesh.quaternion.copy(boxBody.quaternion)
-
-//   // Render the scene
-//   renderer.render(scene, camera);
-
-//   // Request the next animation frame
-//   requestAnimationFrame(animate);
-// }
-
-// renderer.setAnimationLoop(animate)
-
-// window.addEventListener('resize', function(){
-//   camera.aspect = window.innerWidth / window.innerHeight
-//   camera.updateProjectionMatrix()
-//   renderer.setSize(window.innerWidth, window.innerHeight)
-// })
+// create box's
+const boxGeometry = new THREE.BoxGeometry(1, 1, 1)
+const boxMaterial = new THREE.MeshStandardMaterial({
+  metalness:0.3,
+  roughness: 0.4
+})
 
 
+const createBox = (width, height, depth, position) => {
+  // threejs mesh
+  const mesh = new THREE.Mesh(boxGeometry, boxMaterial);
+  mesh.scale.set(width, height, depth);
+  mesh.castShadow = true;
+  mesh.position.copy(position);
+  scene.add(mesh);
+
+  // cannon shapes
+  const shape = new CANNON.Box(new CANNON.Vec3(width / 2, height / 2, depth / 2));
+  const body = new CANNON.Body({
+    mass: 1, //0.000001,
+    type: 2,
+    position: new CANNON.Vec3(0, 0, 0),
+    shape: shape,
+    material: new CANNON.Material() // Using CANNON.Material directly
+  });
+  body.position.copy(position);
+  // body.addEventListener('collide', playSfx) example to use when we are doing the win condition
+  world.addBody(body);
+
+  // save in objects to update
+  objectsToUpdate.push({
+    mesh: mesh,
+    body: body
+  });
+};
+
+function createMaze() {
+  // Dimensions of the maze
+  const numRows = maze.length;
+  const numCols = maze[0].length;
+
+  // Size of each cell in the maze
+  const cellSize = 2;
+
+  // Calculate the adjusted spacing between each box
+  const adjustedSpacing = (cellSize - 0.5) / 2;
+
+  // Starting position of the maze
+  const startX = -((numCols - 1) * cellSize) / 2 + adjustedSpacing;
+  const startZ = -((numRows - 1) * cellSize) / 2 + adjustedSpacing;
+
+  // Create boxes based on maze layout
+  for (let row = 0; row < numRows; row++) {
+    for (let col = 0; col < numCols; col++) {
+      if (maze[row][col] === 1) { // Flip condition from 0 to 1
+        const positionX = startX + col * cellSize;
+        const positionZ = startZ + row * cellSize;
+        createBox(1.9, 2, 1.9, { x: positionX, y: 0, z: positionZ });
+      }
+    }
+  }
+}
+
+createMaze();
+
+// ------------------------------Cnntrols--------------
+
+const controls = new PointerLockControls(camera, document.body);
+
+// Event listener to start the pointer lock when user clicks the scene
+document.body.addEventListener('click', () => {
+  controls.lock();
+});
+
+// Event listener to handle mouse movements and update camera rotation
+document.addEventListener('mousemove', (event) => {
+  if (controls.isLocked) {
+    const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
+    const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+
+    // Update camera rotation based on mouse movements
+    // controls.updateRotation(movementX, movementY);
+  }
+});
+
+document.addEventListener('pointerlockchange', () => {
+  console.log("!@# pointerlockchange")
+  // controls.isLocked = document.pointerLockElement === renderer.domElement;
+});
+
+document.addEventListener('mozpointerlockchange', () => {
+  // controls.isLocked = document.mozPointerLockElement === renderer.domElement;
+});
+
+const keys = {w: false, a: false, s: false, d: false}
+
+document.addEventListener('keydown', function (event) {
+  switch (event.code) {
+    case 'KeyW':
+      keys['w'] = true
+      break;
+    case 'KeyS':
+      keys['s'] = true
+      break;
+    case 'KeyA':
+      keys['a'] = true
+      break;
+    case 'KeyD':
+      keys['d'] = true
+      break;
+  }
+})
+
+
+document.addEventListener('keyup', function (event) {
+  switch (event.code) {
+    case 'KeyW':
+      keys['w'] = false
+      break;
+    case 'KeyS':
+      keys['s'] = false
+      break;
+    case 'KeyA':
+      keys['a'] = false
+      break;
+    case 'KeyD':
+      keys['d'] = false
+      break;
+  }
+})
 
 
 
 
 
-// -------------------------Movement working, and box wall working -------------
+const clock = new THREE.Clock()
+let oldElapsedTIme = 0
 
-//  this might work for map generation
+// Render loop
+function animate() {
 
-// create the walls of the maze
-// for (let z = 0; z < mazeArray.length; z++) {
-//     for (let x = 0; x < mazeArray[z].length; x++) {
-//         if (mazeArray[z][x] === 1) {
-//             // create a wall
-//             const wallGeometry = new THREE.BoxGeometry(1, 1, 1);
-//             const wallMaterial = new THREE.MeshBasicMaterial({color: 0x00ff00});
-//             const wall = new THREE.Mesh(wallGeometry, wallMaterial);
-//             scene.add(wall);
-//             wall.position.set(x, 0.5, z);
+  const elapsedTime = clock.getElapsedTime()
+  const deltaTime = elapsedTime - oldElapsedTIme
+  oldElapsedTIme = elapsedTime
 
-//             // create a wall physics body
-//             const wallShape = new Box(new Vec3(0.5, 0.5, 0.5));
-//             const wallBody = new Body({ mass: 0 }); // walls are static
-//             wallBody.addShape(wallShape);
-//             wallBody.position.set(x, 0.5, z);
-//             world.addBody(wallBody);
-//         }
-//     }
-// }
+  // sphereBody.applyForce(new CANNON.Vec3(-.05, 0, 0), sphereBody.position)
+
+  // update physics world
+  world.step(1/60, deltaTime, 3 )
+
+  for(const object of objectsToUpdate) {
+    object.mesh.position.copy(object.body.position)
+  }
+  // sphereMesh.position.copy(sphereBody.position)
+
+  const force = 25
+  if(keys['w']) {
+    let input = new CANNON.Vec3(0, 0,  -force * deltaTime);
+    const cameraRotation = controls.getObject().quaternion;
+    const cam = new CANNON.Quaternion()
+    cam.copy(cameraRotation)
+    let world = cam.vmult(input)
+    cameraBody.applyImpulse(world)
+  } else if(keys['s']) {
+    cameraBody.applyImpulse(new CANNON.Vec3(-force * deltaTime, 0,  0))
+  } else if(keys['a']) {
+    cameraBody.applyImpulse(new CANNON.Vec3(0, 0,  force * deltaTime))
+  } else if(keys['d']) {
+    cameraBody.applyImpulse(new CANNON.Vec3(0, force * deltaTime,  0))
+  }
+  // cameraBody.position.copy(controls.getObject().position);
+  // cameraBody.quaternion.copy(controls.getObject().quaternion);
+  camera.position.copy(cameraBody.position);
+  // camera.quaternion.copy(cameraBody.quaternion);​
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+}
+animate();
+
+window.addEventListener('resize', function(){
+  camera.aspect = window.innerWidth / window.innerHeight
+  camera.updateProjectionMatrix()
+  renderer.setSize(window.innerWidth, window.innerHeight)
+})
