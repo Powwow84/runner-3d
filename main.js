@@ -7,6 +7,8 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js'
 
 
+let isStartScreenActive = true;
+let requestId;
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.domElement.requestPointerLock = renderer.domElement.requestPointerLock || renderer.domElement.mozRequestPointerLock;
@@ -18,7 +20,6 @@ document.body.appendChild(renderer.domElement);
 // ----------------Start Screen Scene
 
 const startScreen = () => {
-
   // Create a camera
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(0, 30, 40);
@@ -187,7 +188,12 @@ renderer.domElement.addEventListener('click', function (event) {
   raycaster.setFromCamera(mouse, camera);
   const intersects = raycaster.intersectObject(startButton);
   if (intersects.length > 0) {
-    console.log('Start button clicked!');
+    isStartScreenActive = false
+    console.log(requestId)
+    cancelAnimationFrame(requestId)
+    scene.clear()
+    console.log(isStartScreenActive);
+    console.log(requestId)
   }
 });
 
@@ -195,7 +201,8 @@ renderer.domElement.addEventListener('click', function (event) {
 
 // Render loop
 function animate() {
-  requestAnimationFrame(animate);
+  if (isStartScreenActive === false) return;
+  requestId = requestAnimationFrame(animate)
   renderer.render(scene, camera);
   
 }
@@ -210,7 +217,9 @@ window.addEventListener('resize', function(){
 
 }
 
-startScreen()
+
+// startScreen()
+// console.log(isStartScreenActive)
 
 
 
@@ -241,6 +250,57 @@ bgMusic.play()
 // {
 //   sfx.play
 // }
+
+const startBox = new THREE.BoxGeometry(3 , .5 ,1)
+const startButtonMaterial = new THREE.MeshStandardMaterial({ color: 0xFFFFFF})
+const startButton = new THREE.Mesh(startBox, startButtonMaterial)
+scene.add(startButton)
+startButton.position.set(0,20,0)
+
+const loader = new FontLoader();
+
+loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', function ( font ){
+
+	const fontgeometry = new TextGeometry( 'Runner', {
+		font: font,
+		size: 5,
+		height: 0.3,
+		curveSegments: 12,
+		bevelEnabled: true,
+		bevelThickness: 0,
+		bevelSize: 0,
+		bevelOffset: 0,
+		bevelSegments: 0
+	} );
+  const fontMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+  
+  const textMesh = new THREE.Mesh(fontgeometry, fontMaterial);
+  scene.add(textMesh);
+  textMesh.position.set(-15, 15.5, 8);
+  textMesh.rotation.x = Math.PI / -2
+} );
+
+loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', function ( font ){
+
+	const fontgeometry = new TextGeometry( '3D', {
+		font: font,
+		size: 5,
+		height: 0,
+		curveSegments: 12,
+		bevelEnabled: true,
+		bevelThickness: 1,
+		bevelSize: 0,
+		bevelOffset: 0,
+		bevelSegments: 1
+	} );
+  const fontMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+  
+  const textMesh = new THREE.Mesh(fontgeometry, fontMaterial);
+  scene.add(textMesh);
+  textMesh.position.set(9, 15, 1);
+  textMesh.rotation.x = 5.5
+} );
+
 // --------------Cannon ES Set up ----------------------------
 
 const world = new CANNON.World()
@@ -267,14 +327,17 @@ world.addContactMaterial(defaultContactMaterial)
 world.defaultContactMaterial = defaultContactMaterial
 
 // ----------------Creating a camera and body---------------
+
+let cameraBodyMass = 0
 const cameraBody = new CANNON.Body({
-  mass: 1,
+  mass: cameraBodyMass,
   shape: new CANNON.Box(new CANNON.Vec3(.2, .5, .2)),
   fixedRotation: true
   // type: 4
 })
 world.addBody(cameraBody)
-cameraBody.position.set(0, 1, 0)
+cameraBody.position.set(0, 30, 0)
+camera.lookAt(new THREE.Vector3(0, 0, 0))
 
 
 // -----------------Creating the cube texture for the world environment
@@ -418,6 +481,19 @@ document.addEventListener('mozpointerlockchange', () => {
   // controls.isLocked = document.mozPointerLockElement === renderer.domElement;
 });
 
+renderer.domElement.addEventListener('click', function (event) {
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObject(startButton);
+  if (intersects.length > 0) {
+    cameraBody.mass = 1
+    console.log(cameraBody.mass)
+  }
+});
+
 const keys = {w: false, a: false, s: false, d: false}
 
 document.addEventListener('keydown', function (event) {
@@ -513,6 +589,6 @@ window.addEventListener('resize', function(){
 }
 
 
-// gameInit()
+gameInit()
 
 // startScreen()
