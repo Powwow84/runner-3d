@@ -67,6 +67,20 @@ const cameraBody = new CANNON.Body({
 world.addBody(cameraBody)
 cameraBody.position.set(0, 1, 0)
 
+
+// -----------------Creating the cube texture for the world environment
+
+const cubeTextureLoader = new THREE.CubeTextureLoader()
+scene.background = cubeTextureLoader.load([
+  'public/imgs/Untitled design/1.jpg',
+  'public/imgs/Untitled design/3.jpg',
+  'public/imgs/Untitled design/2.jpg',
+  'public/imgs/Untitled design/4.jpg',
+  'public/imgs/Untitled design/5.jpg',
+  'public/imgs/Untitled design/6.jpg',
+  
+])
+
 // Create a plane
 const planeGeometry = new THREE.PlaneGeometry(130, 100);
 const planeMaterial = new THREE.MeshPhongMaterial({
