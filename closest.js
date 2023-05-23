@@ -1,10 +1,8 @@
 // import * as THREE from 'three';
-// import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
+// import {PointerLockControls} from 'three/examples/jsm/controls/PointerLockControls';
 // import * as CANNON from 'cannon-es';
-// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-// import * as dat from 'dat.gui'
 // import maze from './mapArray';
-
+// import CannonDebugger from 'cannon-es-debugger';
 
 // // --------------Three Js setup ----------------
 // // Set up renderer
@@ -30,15 +28,15 @@
 // // const sfx = new Audio('public/music/661499__het_hckm_ds_huis__mortality-boring-death-dying-clock-tick-tock-klok-tik-tak-incl-20-hertz-sometimes-02-01.mp3')
 // // // bgMusic.play()
 
-// // const playSfx = () => 
+// // const playSfx = () =>
 // // {
 // //   sfx.play
 // // }
 // // --------------Cannon ES Set up ----------------------------
 
 // const world = new CANNON.World()
-// world.broadphase = new CANNON.SAPBroadphase(world)
-// world.allowsleep = true
+// // world.broadphase = new CANNON.SAPBroadphase(world)
+// // world.allowsleep = true
 // world.gravity.set(0, -9.82, 0)
 
 // // ---------------------Generate default material-----
@@ -48,7 +46,7 @@
 //   defaultMaterial,
 //   defaultMaterial,
 //   {
-//     friction: 1,
+//     friction: 0.005,
 //     restitution: 0
 //   }
 // )
@@ -57,8 +55,10 @@
 
 // // ----------------Creating a camera and body---------------
 // const cameraBody = new CANNON.Body({
-//   mass:.0000001,
-//   shape: new CANNON.Sphere(1),
+//   mass: 1,
+//   shape: new CANNON.Box(new CANNON.Vec3(1, 1, 1)),
+//   fixedRotation: true
+//   // type: 4
 // })
 // world.addBody(cameraBody)
 // cameraBody.position.set(0, 1, 0)
@@ -100,7 +100,7 @@
 // const boxGeometry = new THREE.BoxGeometry(1, 1, 1)
 // const boxMaterial = new THREE.MeshStandardMaterial({
 //   metalness:0.3,
-//   roughness: 0.4
+//   roughness: 0.4,
 // })
 
 
@@ -115,7 +115,8 @@
 //   // cannon shapes
 //   const shape = new CANNON.Box(new CANNON.Vec3(width / 2, height / 2, depth / 2));
 //   const body = new CANNON.Body({
-//     mass: 1,
+//     mass: 10, //0.000001,
+//     type: 2,
 //     position: new CANNON.Vec3(0, 0, 0),
 //     shape: shape,
 //     material: new CANNON.Material() // Using CANNON.Material directly
@@ -152,7 +153,7 @@
 //       if (maze[row][col] === 1) { // Flip condition from 0 to 1
 //         const positionX = startX + col * cellSize;
 //         const positionZ = startZ + row * cellSize;
-//         createBox(1.9, 2, 1.9, { x: positionX, y: 0, z: positionZ });
+//         createBox(2, 6, 2, { x: positionX, y: 0, z: positionZ });
 //       }
 //     }
 //   }
@@ -160,7 +161,9 @@
 
 // createMaze();
 
-// // -------------------------------Cnntrols--------------
+
+
+// // ------------------------------Cnntrols--------------
 
 // const controls = new PointerLockControls(camera, document.body);
 
@@ -176,36 +179,55 @@
 //     const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
 
 //     // Update camera rotation based on mouse movements
-//     controls.updateRotation(movementX, movementY);
+//     // controls.updateRotation(movementX, movementY);
 //   }
 // });
 
 // document.addEventListener('pointerlockchange', () => {
-//   controls.isLocked = document.pointerLockElement === renderer.domElement;
+//   console.log(controls.isLocked)
+//   // controls.isLocked = document.pointerLockElement === renderer.domElement;
 // });
 
 // document.addEventListener('mozpointerlockchange', () => {
-//   controls.isLocked = document.mozPointerLockElement === renderer.domElement;
+//   // controls.isLocked = document.mozPointerLockElement === renderer.domElement;
 // });
 
-// function handleKeyDown(event) {
+// const keys = {w: false, a: false, s: false, d: false}
+
+// document.addEventListener('keydown', function (event) {
 //   switch (event.code) {
 //     case 'KeyW':
-//       controls.moveForward(.5)
+//       keys['w'] = true
 //       break;
 //     case 'KeyS':
-//       controls.moveForward(-.5)
+//       keys['s'] = true
 //       break;
 //     case 'KeyA':
-//       controls.moveRight(-.5)
+//       keys['a'] = true
 //       break;
 //     case 'KeyD':
-//       controls.moveRight(.5)
+//       keys['d'] = true
 //       break;
 //   }
-// }
+// })
 
-// document.addEventListener('keydown', handleKeyDown)
+
+// document.addEventListener('keyup', function (event) {
+//   switch (event.code) {
+//     case 'KeyW':
+//       keys['w'] = false
+//       break;
+//     case 'KeyS':
+//       keys['s'] = false
+//       break;
+//     case 'KeyA':
+//       keys['a'] = false
+//       break;
+//     case 'KeyD':
+//       keys['d'] = false
+//       break;
+//   }
+// })
 
 
 
@@ -220,32 +242,40 @@
 //   const elapsedTime = clock.getElapsedTime()
 //   const deltaTime = elapsedTime - oldElapsedTIme
 //   oldElapsedTIme = elapsedTime
-  
+
 //   // sphereBody.applyForce(new CANNON.Vec3(-.05, 0, 0), sphereBody.position)
-  
+
 //   // update physics world
 //   world.step(1/60, deltaTime, 3 )
-  
-  
+
 //   for(const object of objectsToUpdate) {
 //     object.mesh.position.copy(object.body.position)
 //   }
 //   // sphereMesh.position.copy(sphereBody.position)
-  
-  
-  
 
-  
-//   cameraBody.position.copy(controls.getObject().position);
-//   cameraBody.quaternion.copy(controls.getObject().quaternion);
-  
-//   // camera.position.copy(cameraBody.position);
-//   // camera.quaternion.copy(cameraBody.quaternion);
-  
+//   const force = 25
+//   if(keys['w']) {
+//     let input = new CANNON.Vec3(0, 0,  -force * deltaTime);
+//     const cameraRotation = controls.getObject().quaternion;
+//     const cam = new CANNON.Quaternion()
+//     cam.copy(cameraRotation)
+//     let world = cam.vmult(input)
+//     cameraBody.applyImpulse(world)
+//   } else if(keys['a']) {
+//     cameraBody.applyImpulse(new CANNON.Vec3(-force * deltaTime, 0,  0))
+//   } else if(keys['s']) {
+//     cameraBody.applyImpulse(new CANNON.Vec3(0, 0,  force * deltaTime))
+//   } else if(keys['d']) {
+//     cameraBody.applyImpulse(new CANNON.Vec3(force * deltaTime, 0,  0))
+//   }
+//   // cameraBody.position.copy(controls.getObject().position);
+//   // cameraBody.quaternion.copy(controls.getObject().quaternion);
+//   camera.position.copy(cameraBody.position);
+//   // camera.quaternion.copy(cameraBody.quaternion);​
 //   requestAnimationFrame(animate);
 //   renderer.render(scene, camera);
+  
 // }
-
 // animate();
 
 // window.addEventListener('resize', function(){

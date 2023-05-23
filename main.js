@@ -56,7 +56,7 @@ world.defaultContactMaterial = defaultContactMaterial
 // ----------------Creating a camera and body---------------
 const cameraBody = new CANNON.Body({
   mass: 1,
-  shape: new CANNON.Box(new CANNON.Vec3(1, 1, 1)),
+  shape: new CANNON.Box(new CANNON.Vec3(.5, .5, .5)),
   fixedRotation: true
   // type: 4
 })
@@ -100,7 +100,7 @@ const objectsToUpdate = []
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1)
 const boxMaterial = new THREE.MeshStandardMaterial({
   metalness:0.3,
-  roughness: 0.4,
+  roughness: 0.1,
 })
 
 
