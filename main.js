@@ -50,7 +50,7 @@ const defaultContactMaterial = new CANNON.ContactMaterial(
   defaultMaterial,
   defaultMaterial,
   {
-    friction: 0.009,
+    friction: 0.001,
     restitution: .5
   }
 )
@@ -74,7 +74,7 @@ const planeMaterial = new THREE.MeshPhongMaterial({
 const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
 planeMesh.receiveShadow = true; // Enable shadow casting on the plane
 scene.add(planeMesh);
-planeMesh.rotation.x = -0.5* Math.PI
+planeMesh.rotation.x = -0.5 * Math.PI
 
 const floorShape = new CANNON.Plane()
 const floorBody = new CANNON.Body()
@@ -142,7 +142,7 @@ function createMaze() {
   const numCols = maze[0].length;
 
   // Size of each cell in the maze
-  const cellSize = 2;
+  const cellSize = 1;
 
   // Calculate the adjusted spacing between each box
   const adjustedSpacing = (cellSize - 0.5) / 2;
@@ -157,7 +157,7 @@ function createMaze() {
       if (maze[row][col] === 1) { // Flip condition from 0 to 1
         const positionX = startX + col * cellSize;
         const positionZ = startZ + row * cellSize;
-        createBox(2, 6, 2, { x: positionX, y: 0, z: positionZ });
+        createBox(1, 6, 1, { x: positionX, y: 1, z: positionZ });
       }
     }
   }
@@ -182,8 +182,7 @@ document.addEventListener('mousemove', (event) => {
     const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
     const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
 
-    // Update camera rotation based on mouse movements
-    // controls.updateRotation(movementX, movementY);
+ 
   }
 });
 
@@ -257,7 +256,7 @@ function animate() {
   }
   // sphereMesh.position.copy(sphereBody.position)
 
-  const force = 25
+  const force = 5
   if(keys['w']) {
     let input = new CANNON.Vec3(0, 0,  -force * deltaTime);
     const cameraRotation = controls.getObject().quaternion;
