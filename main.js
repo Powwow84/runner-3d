@@ -74,8 +74,8 @@ loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', fu
 
 
 // Add OrbitControls
-const orbitControls = new OrbitControls(camera, renderer.domElement);
-orbitControls.update()
+// const orbitControls = new OrbitControls(camera, renderer.domElement);
+// orbitControls.update()
 
 // ---------------Start Button ----------------------
 
@@ -85,10 +85,10 @@ const startButton = new THREE.Mesh(startBox, startButtonMaterial)
 scene.add(startButton)
 startButton.position.set(0,20,34)
 
-startButton.addEventListener('click', function(event) {
-  // Your event handling code here
-  console.log('Start button clicked!');
-});
+// startButton.addEventListener('click', function(event) {
+//   // Your event handling code here
+//   console.log('Start button clicked!');
+// });
 
 
 // -----------------Creating the cube texture for the world environment
@@ -179,11 +179,22 @@ function createMaze() {
 
 createMaze();
 
+renderer.domElement.addEventListener('click', function (event) {
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObject(startButton);
+  if (intersects.length > 0) {
+    console.log('Start button clicked!');
+  }
+});
+
 
 
 // Render loop
 function animate() {
-
   requestAnimationFrame(animate);
   renderer.render(scene, camera);
   
@@ -198,6 +209,12 @@ window.addEventListener('resize', function(){
 })
 
 }
+
+startScreen()
+
+
+
+// *************************Game Init
 
 
 const gameInit = () => {
@@ -498,4 +515,4 @@ window.addEventListener('resize', function(){
 
 // gameInit()
 
-startScreen()
+// startScreen()
