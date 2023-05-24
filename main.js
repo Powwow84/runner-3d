@@ -27,7 +27,7 @@ const gameInit = () => {
   camera.position.set(0, 1, 0);
   // Create a scene
   const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0xC0C0C0, 0, 5)
+  scene.fog = new THREE.Fog(0x202020, 0, 5)
 
 // Add OrbitControls
 // const orbitControls = new OrbitControls(camera, renderer.domElement);
@@ -201,7 +201,7 @@ const cameraBody = new CANNON.Body({
   // type: 4
 })
 world.addBody(cameraBody)
-cameraBody.position.set(0, 1, 70)
+cameraBody.position.set(0, 1, 0)
 
 
 
@@ -263,8 +263,9 @@ platformBody.position.set(0, 0, 70)
 
 
 // Create lighting
-// const ambientLight = new THREE.AmbientLight(0x404040); // Ambient light
-// scene.add(ambientLight);
+const ambientLight = new THREE.AmbientLight(0x404040);
+ambientLight.intensity = .5 // Ambient light
+scene.add(ambientLight);
 
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // Directional light
 directionalLight.position.set(0, 20, 0);
