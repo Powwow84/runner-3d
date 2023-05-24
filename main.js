@@ -74,7 +74,7 @@ loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', fu
 		bevelOffset: 0,
 		bevelSegments: 0
 	} );
-  const fontMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+  const fontMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000, transparent: true, opacity: 1 });
   
   const textMesh = new THREE.Mesh(fontgeometry, fontMaterial);
   scene.add(textMesh);
@@ -103,6 +103,8 @@ loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', fu
   // textMesh.rotation.x = 5.5
 } );
 
+let lookMessage;
+
 loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', function ( font ){
 
 	const fontgeometry = new TextGeometry( 'Look Down!', {
@@ -118,11 +120,13 @@ loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', fu
 	} );
   const fontMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
   
-  const textMesh = new THREE.Mesh(fontgeometry, fontMaterial);
-  scene.add(textMesh);
-  textMesh.position.set(-18, 45, -15);
+  lookMessage = new THREE.Mesh(fontgeometry, fontMaterial);
+  scene.add(lookMessage);
+  lookMessage.position.set(-18, -5, -15);
   // textMesh.rotation.x = 5.5
 } );
+
+let findText
 
 loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', function ( font ){
 
@@ -139,11 +143,12 @@ loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', fu
 	} );
   const fontMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
   
-  const textMesh = new THREE.Mesh(fontgeometry, fontMaterial);
-  scene.add(textMesh);
-  textMesh.position.set(-18, 20, 0);
-  textMesh.rotation.x = Math.PI / -2;
+  findText = new THREE.Mesh(fontgeometry, fontMaterial);
+  scene.add(findText);
+  findText.position.set(-18, -5, 0);
+  findText.rotation.x = Math.PI / -2;
 } );
+
 
 loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', function ( font ){
 
@@ -196,12 +201,12 @@ world.defaultContactMaterial = defaultContactMaterial
 
 const cameraBody = new CANNON.Body({
   mass: 1,
-  shape: new CANNON.Box(new CANNON.Vec3(.2, .5, .2)),
+  shape: new CANNON.Box(new CANNON.Vec3(.2, .5, .1)),
   fixedRotation: true
   // type: 4
 })
 world.addBody(cameraBody)
-cameraBody.position.set(0, 1, 0)
+cameraBody.position.set(0, 1, 70)
 
 
 
@@ -267,12 +272,18 @@ const ambientLight = new THREE.AmbientLight(0x404040);
 ambientLight.intensity = .5 // Ambient light
 scene.add(ambientLight);
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // Directional light
-directionalLight.position.set(0, 20, 0);
+const directionalLight = new THREE.DirectionalLight(0xffffff, .3); // Directional light
+directionalLight.position.set(-30, 80, 25);
 directionalLight.castShadow = true; // Enable shadow casting from the light
 scene.add(directionalLight);
 
+directionalLight.shadow.camera.left = -50;   // Adjust left value
+directionalLight.shadow.camera.right = 50;   // Adjust right value
+directionalLight.shadow.camera.top = 50;     // Adjust top value
+directionalLight.shadow.camera.bottom = -50;
 
+// const helper = new THREE.DirectionalLightHelper(directionalLight);
+// scene.add(helper);
 // ----------------Utilities-----------
 
 const objectsToUpdate = []
@@ -353,7 +364,9 @@ renderer.domElement.addEventListener('click', function (event) {
   if (intersects.length > 0) {
     cameraBody.position.set(0, 50, 0)
     bgMusic.play()
-    // bgMusic.loop = true
+    bgMusic.loop = true
+    lookMessage.position.set(-18, 45, -15)
+    findText.position.set(-18, 20, 0);
   }
 });
 
