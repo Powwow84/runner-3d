@@ -27,7 +27,7 @@ const gameInit = () => {
   camera.position.set(0, 1, 0);
   // Create a scene
   const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0xC0C0C0, 0, 30)
+  // scene.fog = new THREE.Fog(0xC0C0C0, 0, 30)
 
 // Add OrbitControls
 // const orbitControls = new OrbitControls(camera, renderer.domElement);
@@ -74,7 +74,7 @@ loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', fu
 		bevelOffset: 0,
 		bevelSegments: 0
 	} );
-  const fontMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+  const fontMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
   
   const textMesh = new THREE.Mesh(fontgeometry, fontMaterial);
   scene.add(textMesh);
@@ -195,13 +195,13 @@ world.defaultContactMaterial = defaultContactMaterial
 
 
 const cameraBody = new CANNON.Body({
-  mass: 1,
+  mass: 0,
   shape: new CANNON.Box(new CANNON.Vec3(.2, .5, .2)),
   fixedRotation: true
   // type: 4
 })
 world.addBody(cameraBody)
-cameraBody.position.set(0, 0.5, 70)
+cameraBody.position.set(0, 1, 70)
 
 
 
@@ -261,11 +261,11 @@ platformBody.position.set(0, 0, 70)
 
 
 // Create lighting
-const ambientLight = new THREE.AmbientLight(0x404040); // Ambient light
-scene.add(ambientLight);
+// const ambientLight = new THREE.AmbientLight(0x404040); // Ambient light
+// scene.add(ambientLight);
 
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // Directional light
-directionalLight.position.set(0, 10, 0);
+directionalLight.position.set(0, 20, 0);
 directionalLight.castShadow = true; // Enable shadow casting from the light
 scene.add(directionalLight);
 
