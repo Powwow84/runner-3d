@@ -27,7 +27,7 @@ const gameInit = () => {
   camera.position.set(0, 1, 0);
   // Create a scene
   const scene = new THREE.Scene();
-  // scene.fog = new THREE.Fog(0xC0C0C0, 0, 30)
+  scene.fog = new THREE.Fog(0xC0C0C0, 0, 5)
 
 // Add OrbitControls
 // const orbitControls = new OrbitControls(camera, renderer.domElement);
@@ -195,7 +195,7 @@ world.defaultContactMaterial = defaultContactMaterial
 
 
 const cameraBody = new CANNON.Body({
-  mass: 0,
+  mass: 1,
   shape: new CANNON.Box(new CANNON.Vec3(.2, .5, .2)),
   fixedRotation: true
   // type: 4
@@ -209,23 +209,25 @@ cameraBody.position.set(0, 1, 70)
 
 const cubeTextureLoader = new THREE.CubeTextureLoader()
 scene.background = cubeTextureLoader.load([
-  'public/imgs/Untitled design/1.jpg',
-  'public/imgs/Untitled design/3.jpg',
-  'public/imgs/Untitled design/2.jpg',
-  'public/imgs/Untitled design/4.jpg',
-  'public/imgs/Untitled design/5.jpg',
-  'public/imgs/Untitled design/6.jpg',
-  
+
+  'public/skyBoxImg/side3.jpg', 
+  'public/skyBoxImg/side1.jpg', 
+  'public/skyBoxImg/topscene.jpg', 
+  'public/skyBoxImg/bottomScene.jpg', 
+  'public/skyBoxImg/side4.jpg', 
+  'public/skyBoxImg/side2.jpg', 
+
 ])
 
 // Create a plane
-const planeGeometry = new THREE.PlaneGeometry(100, 100);
+const planeGeometry = new THREE.BoxGeometry(100, 100, 5);
 const planeMaterial = new THREE.MeshPhongMaterial({
   map: textureLoader.load('public/imgs/Untitled design/4.jpg') });
 const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
 planeMesh.receiveShadow = true; // Enable shadow casting on the plane
 scene.add(planeMesh);
 planeMesh.rotation.x = -0.5 * Math.PI
+planeMesh.position.set(0, -3, 0)
 
 const floorBody = new CANNON.Body({
   shape:new CANNON.Box(new CANNON.Vec3(50,50, 0.1)),
@@ -350,7 +352,7 @@ renderer.domElement.addEventListener('click', function (event) {
   if (intersects.length > 0) {
     cameraBody.position.set(0, 50, 0)
     bgMusic.play()
-    bgMusic.loop = true
+    // bgMusic.loop = true
   }
 });
 
