@@ -5,6 +5,7 @@ import maze from './mapArray';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js'
+import CannonDebugger from 'cannon-es-debugger';
 
 
 // --------------Three Js setup ----------------
@@ -35,13 +36,10 @@ const gameInit = () => {
 // ----------------------------Files---------------------------------
 
 const bgMusic = new Audio('public/music/tunetank.com_5196_secrets-of-the-house-on-the-hill_by_rage-sound.mp3')
-// const sfx = new Audio('public/music/661499__het_hckm_ds_huis__mortality-boring-death-dying-clock-tick-tock-klok-tik-tak-incl-20-hertz-sometimes-02-01.mp3')
 
+const restartMusic = new Audio('public/music/tunetank.com_5212_castle-in-the-village_by_rage-sound-02-02.mp3')
 
-// const playSfx = () =>
-// {
-//   sfx.play
-// }
+// -------------------Start Box-------------
 
 const startBox = new THREE.BoxGeometry(3 , .5 ,1)
 const startButtonMaterial = new THREE.MeshBasicMaterial({ color: 0xFFFFFF})
@@ -49,6 +47,17 @@ const startButton = new THREE.Mesh(startBox, startButtonMaterial)
 scene.add(startButton)
 startButton.position.set(0,0,45)
 startButton.rotation.x = Math.PI / -2
+
+//  ------------------- Restart Sphere -----------
+
+const restartSphere = new THREE.SphereGeometry(2)
+const restartMaterial = new THREE.MeshStandardMaterial({
+color: 0xFFFFFF
+})
+const restart = new THREE.Mesh(restartSphere, restartMaterial)
+scene.add(restart)
+restart.position.set(35, 3, -30);
+
 
 const loader = new FontLoader();
 
@@ -136,6 +145,27 @@ loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', fu
   textMesh.rotation.x = Math.PI / -2;
 } );
 
+loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', function ( font ){
+
+	const fontgeometry = new TextGeometry( 'Congrats', {
+		font: font,
+		size: 3,
+		height: 0,
+		curveSegments: 12,
+		bevelEnabled: true,
+		bevelThickness: 1,
+		bevelSize: 0,
+		bevelOffset: 0,
+		bevelSegments: 1
+	} );
+  const fontMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+  
+  const textMesh = new THREE.Mesh(fontgeometry, fontMaterial);
+  scene.add(textMesh);
+  textMesh.position.set(15, 2, -30);
+  
+} );
+
 // --------------Cannon ES Set up ----------------------------
 
 const world = new CANNON.World()
@@ -171,7 +201,7 @@ const cameraBody = new CANNON.Body({
   // type: 4
 })
 world.addBody(cameraBody)
-cameraBody.position.set(0, 0.5, 50)
+cameraBody.position.set(0, 0.5, 70)
 
 
 
@@ -189,7 +219,7 @@ scene.background = cubeTextureLoader.load([
 ])
 
 // Create a plane
-const planeGeometry = new THREE.PlaneGeometry(130, 100);
+const planeGeometry = new THREE.PlaneGeometry(100, 100);
 const planeMaterial = new THREE.MeshPhongMaterial({
   map: textureLoader.load('public/imgs/Untitled design/4.jpg') });
 const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
@@ -197,15 +227,37 @@ planeMesh.receiveShadow = true; // Enable shadow casting on the plane
 scene.add(planeMesh);
 planeMesh.rotation.x = -0.5 * Math.PI
 
-const floorShape = new CANNON.Plane()
-const floorBody = new CANNON.Body()
-floorBody.mass = 0
-floorBody.addShape(floorShape)
+const floorBody = new CANNON.Body({
+  shape:new CANNON.Box(new CANNON.Vec3(50,50, 0.1)),
+  mass: 0
+})
 floorBody.quaternion.setFromAxisAngle(
   new CANNON.Vec3(-1, 0, 0),
   Math.PI * .5
 )
 world.addBody(floorBody)
+
+// Create platform
+
+const platformGeometry = new THREE.PlaneGeometry(10, 10);
+const platformMaterial = new THREE.MeshPhongMaterial({
+  map: textureLoader.load('public/imgs/Untitled design/4.jpg') });
+const platformMesh = new THREE.Mesh(platformGeometry, platformMaterial);
+platformMesh.receiveShadow = true; // Enable shadow casting on the plane
+platformMesh.position.set(0, 0, 70)
+scene.add(platformMesh);
+platformMesh.rotation.x = -0.5 * Math.PI
+
+const platformBody = new CANNON.Body({
+  shape:new CANNON.Box(new CANNON.Vec3(5,5, 0.1)),
+  mass: 0
+})
+platformBody.quaternion.setFromAxisAngle(
+  new CANNON.Vec3(-1, 0, 0),
+  Math.PI * .5
+)
+world.addBody(platformBody)
+platformBody.position.set(0, 0, 70)
 
 
 // Create lighting
@@ -286,7 +338,36 @@ function createMaze() {
 
 createMaze();
 
+// --------------------Restart FUnctions
 
+renderer.domElement.addEventListener('click', function (event) {
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObject(startButton);
+  if (intersects.length > 0) {
+    cameraBody.position.set(0, 50, 0)
+    bgMusic.play()
+    bgMusic.loop = true
+  }
+});
+
+renderer.domElement.addEventListener('click', function (event) {
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObject(restart);
+  if (intersects.length > 0) {
+    cameraBody.position.set(-30, 50, 8)
+    restartMusic.play()
+    restartMusic.loop = true
+    bgMusic.pause()
+  }
+});
 
 // ------------------------------Cnntrols--------------
 
@@ -316,18 +397,6 @@ document.addEventListener('mozpointerlockchange', () => {
   // controls.isLocked = document.mozPointerLockElement === renderer.domElement;
 });
 
-renderer.domElement.addEventListener('click', function (event) {
-  const raycaster = new THREE.Raycaster();
-  const mouse = new THREE.Vector2();
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-  raycaster.setFromCamera(mouse, camera);
-  const intersects = raycaster.intersectObject(startButton);
-  if (intersects.length > 0) {
-    cameraBody.position.set(0, 50, 0)
-    bgMusic.play()
-  }
-});
 
 const keys = {w: false, a: false, s: false, d: false}
 
@@ -379,7 +448,9 @@ function animate() {
   const elapsedTime = clock.getElapsedTime()
   const deltaTime = elapsedTime - oldElapsedTIme
   oldElapsedTIme = elapsedTime
-
+  if (cameraBody.position.y <= -100) {
+    cameraBody.position.set(0, 0.5, 70)
+  }
   // sphereBody.applyForce(new CANNON.Vec3(-.05, 0, 0), sphereBody.position)
 
   // update physics world
