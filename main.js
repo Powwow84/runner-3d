@@ -41,11 +41,11 @@ const restartMusic = new Audio('public/music/tunetank.com_5212_castle-in-the-vil
 
 // -------------------Start Box-------------
 
-const startBox = new THREE.BoxGeometry(3 , .5 ,1)
-const startButtonMaterial = new THREE.MeshBasicMaterial({ color: 0xFFFFFF})
+const startBox = new THREE.BoxGeometry(1 , .5 ,1)
+const startButtonMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000})
 const startButton = new THREE.Mesh(startBox, startButtonMaterial)
 scene.add(startButton)
-startButton.position.set(0,0,45)
+startButton.position.set(-4,0,66)
 startButton.rotation.x = Math.PI / -2
 
 //  ------------------- Restart Sphere -----------
@@ -74,7 +74,7 @@ loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', fu
 		bevelOffset: 0,
 		bevelSegments: 0
 	} );
-  const fontMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000, transparent: true, opacity: 1 });
+  const fontMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
   
   const textMesh = new THREE.Mesh(fontgeometry, fontMaterial);
   scene.add(textMesh);
@@ -95,7 +95,7 @@ loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', fu
 		bevelOffset: 0,
 		bevelSegments: 1
 	} );
-  const fontMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+  const fontMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000, fog: false });
   
   const textMesh = new THREE.Mesh(fontgeometry, fontMaterial);
   scene.add(textMesh);
@@ -118,7 +118,7 @@ loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', fu
 		bevelOffset: 0,
 		bevelSegments: 1
 	} );
-  const fontMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+  const fontMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000, fog: false });
   
   lookMessage = new THREE.Mesh(fontgeometry, fontMaterial);
   scene.add(lookMessage);
@@ -141,7 +141,7 @@ loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', fu
 		bevelOffset: 0,
 		bevelSegments: 1
 	} );
-  const fontMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+  const fontMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 , fog: false});
   
   findText = new THREE.Mesh(fontgeometry, fontMaterial);
   scene.add(findText);
