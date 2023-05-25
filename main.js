@@ -249,19 +249,19 @@ cameraBody.position.set(0, 1, 70)
 const cubeTextureLoader = new THREE.CubeTextureLoader()
 scene.background = cubeTextureLoader.load([
 
-  'public/skyBoxImg/side3.jpg', 
-  'public/skyBoxImg/side1.jpg', 
-  'public/skyBoxImg/topscene.jpg', 
-  'public/skyBoxImg/bottomScene.jpg', 
-  'public/skyBoxImg/side4.jpg', 
-  'public/skyBoxImg/side2.jpg', 
+  'https://ucarecdn.com/d0269f89-0cdb-4433-b8e6-76b9e674648f/', //side3
+  'https://ucarecdn.com/08d7d010-beda-49cd-b395-9f0992d17008/', //side1
+  'https://ucarecdn.com/a8e0f013-b145-4e6e-811a-e129a57f1287/', //top
+  'https://ucarecdn.com/ab8ae300-45c9-49f8-bd6a-a065a27b2d99/', //bottom
+  'https://ucarecdn.com/07aca338-fd8d-4075-9632-b76cfd06d9ad/', //side4
+  'https://ucarecdn.com/75808435-d003-4a96-8806-bbebdf8728b3/', //side2
 
 ])
 
 // Create a plane
 const planeGeometry = new THREE.BoxGeometry(100, 100, 15);
 const planeMaterial = new THREE.MeshPhongMaterial({
-  map: textureLoader.load('public/imgs/Untitled design/Untitled design (1).jpg') });
+  map: textureLoader.load('https://ucarecdn.com/a263e549-78a6-4a36-b3e1-1b9f29691fbd/') });
 const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
 planeMesh.receiveShadow = true; // Enable shadow casting on the plane
 scene.add(planeMesh);
@@ -282,7 +282,7 @@ world.addBody(floorBody)
 
 const platformGeometry = new THREE.PlaneGeometry(10, 10);
 const platformMaterial = new THREE.MeshPhongMaterial({
-  map: textureLoader.load('public/imgs/Untitled design/Untitled design (1).jpg') });
+  map: textureLoader.load('https://ucarecdn.com/a263e549-78a6-4a36-b3e1-1b9f29691fbd/') });
 const platformMesh = new THREE.Mesh(platformGeometry, platformMaterial);
 platformMesh.receiveShadow = true; // Enable shadow casting on the plane
 platformMesh.position.set(0, 0, 70)
@@ -325,7 +325,7 @@ const objectsToUpdate = []
 // create box's
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1)
 const boxMaterial = new THREE.MeshStandardMaterial({
-  map: textureLoader.load('public/imgs/Untitled design/AdobeStock_242318067.jpeg') 
+  map: textureLoader.load('https://ucarecdn.com/43890b1b-e3a4-44a3-ac84-b2f44e31a2ff/') 
 })
 
 
