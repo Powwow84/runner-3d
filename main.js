@@ -48,12 +48,12 @@ const startBox = new THREE.BoxGeometry(.5 , .2 ,.2)
 //   map: textureLoader.load('public/imgs/Untitled design/Ready.jpg')
 // })
 const startButtonMultiMaterial = [ 
-  new THREE.MeshBasicMaterial({map: textureLoader.load('public/imgs/Untitled design/Ready.jpg')}),
-  new THREE.MeshBasicMaterial({map: textureLoader.load('public/imgs/Untitled design/Ready.jpg')}),
-  new THREE.MeshBasicMaterial({map: textureLoader.load('public/imgs/Untitled design/Ready.jpg')}),
-  new THREE.MeshBasicMaterial({map: textureLoader.load('public/imgs/Untitled design/Ready2.jpg')}),
-  new THREE.MeshBasicMaterial({map: textureLoader.load('public/imgs/Untitled design/Ready3.jpg')}),
-  new THREE.MeshBasicMaterial({map: textureLoader.load('public/imgs/Untitled design/Ready4.jpg')}),
+  new THREE.MeshBasicMaterial({map: textureLoader.load('https://ucarecdn.com/755d63da-9342-446a-9c1a-e757354fda79/')}),
+  new THREE.MeshBasicMaterial({map: textureLoader.load('https://ucarecdn.com/755d63da-9342-446a-9c1a-e757354fda79/')}),
+  new THREE.MeshBasicMaterial({map: textureLoader.load('https://ucarecdn.com/755d63da-9342-446a-9c1a-e757354fda79/')}),
+  new THREE.MeshBasicMaterial({map: textureLoader.load('https://ucarecdn.com/0de6ff0f-f657-4f5e-8ffa-ce6cb80e2345/')}),
+  new THREE.MeshBasicMaterial({map: textureLoader.load('https://ucarecdn.com/bf044efc-9c3d-490e-bf06-4bb4fc058756/')}),
+  new THREE.MeshBasicMaterial({map: textureLoader.load('https://ucarecdn.com/1e7ca8c9-c20d-4724-912a-c9541772cae6/')}),
 ]
 const startButton = new THREE.Mesh(startBox, startButtonMultiMaterial)
 scene.add(startButton)
