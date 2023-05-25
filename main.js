@@ -402,6 +402,7 @@ createMaze();
 // ------------Game timer --------------
 
 let timer = 60;
+let timerId
 let timerMesh; // Declare textMesh outside the loader callback
 
 function updateTimerText(font) {
@@ -442,21 +443,30 @@ const checkTime = () => {
   if (timer <= 0) {
     // timer = 60 //set in the startgame click function now
     cameraBody.position.set(0,-20,0)
-    // countdown.pause()
+    clearInterval(timerId)
     // timerMesh.position.set(0, -1, 0);
   }
 }
 
-function countdown() {
-  console.log(timer);
-  timer--;
-  updateTimerText();
-  callTimer()
-  checkTime()
+// function countdown() {
+//   console.log(timer);
+//   timer--;
+//   updateTimerText();
+//   callTimer()
+//   checkTime()
   
-  if (timer >= 1) {
-    setTimeout(countdown, 1000);
-  }
+//   if (timer >= 1) {
+//     setTimeout(countdown, 1000);
+//   }
+// }
+
+const countdown = () => {
+  timerId = setInterval(function(){
+    timer--
+    updateTimerText();
+    callTimer()
+    checkTime()
+  }, 1000)
 }
 
 
