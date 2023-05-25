@@ -115,7 +115,7 @@ loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', fu
   
   threeD = new THREE.Mesh(fontgeometry, fontMaterial);
   scene.add(threeD);
-  threeD.position.set(9, 0, 30);
+  threeD.position.set(9, 2, 30);
   // threeD.rotation.x = 0
 } );
 
@@ -386,7 +386,7 @@ const callTimer = () => {
   const fontMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000, fog: false });
   const fontgeometry = new TextGeometry(`${timer}`, {
     font: font,
-    size: 3,
+    size: 10,
     height: 0,
     curveSegments: 12,
     bevelEnabled: true,
@@ -398,8 +398,20 @@ const callTimer = () => {
   timerMesh = new THREE.Mesh(fontgeometry, fontMaterial);
   scene.add(timerMesh);
   timerMesh.position.set(0, 30, 0);
-  // updateTimerText()
+  timerMesh.rotation.x = Math.PI / 2
+  if (cameraBody.position.z === 70) {
+    timerMesh.position.set(0,0,0)
+  }
 });
+}
+
+const checkTime = () => {
+  if (timer <= 0) {
+    timer = 60
+    cameraBody.position.set(0,1,70)
+    countdown.pause()
+    timerMesh.position.set(0, -1, 0);
+  }
 }
 
 function countdown() {
@@ -407,13 +419,14 @@ function countdown() {
   timer--;
   updateTimerText();
   callTimer()
+  checkTime()
   
-  if (timer >= 0) {
+  if (timer >= 1) {
     setTimeout(countdown, 1000);
   }
 }
 
-countdown();
+
 
 
 // --------------------Restart FUnctions
@@ -431,6 +444,13 @@ renderer.domElement.addEventListener('click', function (event) {
     bgMusic.loop = true
     lookMessage.position.set(-18, 45, -15)
     findText.position.set(-18, 20, 0);
+    countdown()
+    setTimeout(function() {
+      findText.position.set(-18, -5, 0);
+      lookMessage.position.set(-18, -5, -15);
+    }, 5000);
+    console.log(setTimeout)
+   
   }
 });
 
