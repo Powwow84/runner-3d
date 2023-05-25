@@ -138,7 +138,7 @@ loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', fu
   
   lookMessage = new THREE.Mesh(fontgeometry, fontMaterial);
   scene.add(lookMessage);
-  lookMessage.position.set(-18, -5, -15);
+  lookMessage.position.set(-18, -7, -15);
   // textMesh.rotation.x = 5.5
 } );
 
@@ -161,7 +161,7 @@ loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', fu
   
   findText = new THREE.Mesh(fontgeometry, fontMaterial);
   scene.add(findText);
-  findText.position.set(-18, -5, 0);
+  findText.position.set(-18, -7, 0);
   findText.rotation.x = Math.PI / -2;
 } );
 
@@ -184,6 +184,27 @@ loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', fu
   const textMesh = new THREE.Mesh(fontgeometry, fontMaterial);
   scene.add(textMesh);
   textMesh.position.set(15, 2, -30);
+  
+} );
+loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', function ( font ){
+
+	const fontgeometry = new TextGeometry( 'Game over. You ran out of time', {
+		font: font,
+		size: 4,
+		height: 0,
+		curveSegments: 9,
+		bevelEnabled: false,
+		bevelThickness: 1,
+		bevelSize: 0,
+		bevelOffset: 0,
+		bevelSegments: 1
+	} );
+  const fontMaterial = new THREE.MeshBasicMaterial({ color: 0x39ff14 , fog : false });
+  
+  const textMesh = new THREE.Mesh(fontgeometry, fontMaterial);
+  scene.add(textMesh);
+  textMesh.position.set(-40, -20, 0);
+  textMesh.rotation.x = Math.PI / 2;
   
 } );
 
@@ -238,14 +259,14 @@ scene.background = cubeTextureLoader.load([
 ])
 
 // Create a plane
-const planeGeometry = new THREE.BoxGeometry(100, 100, 5);
+const planeGeometry = new THREE.BoxGeometry(100, 100, 15);
 const planeMaterial = new THREE.MeshPhongMaterial({
   map: textureLoader.load('public/imgs/Untitled design/Untitled design (1).jpg') });
 const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
 planeMesh.receiveShadow = true; // Enable shadow casting on the plane
 scene.add(planeMesh);
 planeMesh.rotation.x = -0.5 * Math.PI
-planeMesh.position.set(0, -3, 0)
+planeMesh.position.set(0, -8, 0)
 
 const floorBody = new CANNON.Body({
   shape:new CANNON.Box(new CANNON.Vec3(50,50, 0.1)),
@@ -399,7 +420,7 @@ const callTimer = () => {
   scene.add(timerMesh);
   timerMesh.position.set(-9, 30, 2);
   timerMesh.rotation.x = Math.PI / 2
-  if (cameraBody.position.z === 70) {
+  if (cameraBody.position.z >= 70) {
     timerMesh.position.set(0,0,0)
   }
 });
@@ -408,7 +429,7 @@ const callTimer = () => {
 const checkTime = () => {
   if (timer <= 0) {
     timer = 60
-    cameraBody.position.set(0,1,70)
+    cameraBody.position.set(0,-20,0)
     countdown.pause()
     timerMesh.position.set(0, -1, 0);
   }
@@ -446,8 +467,8 @@ renderer.domElement.addEventListener('click', function (event) {
     findText.position.set(-18, 20, 0);
     countdown()
     setTimeout(function() {
-      findText.position.set(-18, -5, 0);
-      lookMessage.position.set(-18, -5, -15);
+      findText.position.set(-18, -7, 0);
+      lookMessage.position.set(-18, -7, -15);
     }, 2000);
    
   }
@@ -549,6 +570,8 @@ function animate() {
   oldElapsedTIme = elapsedTime
   if (cameraBody.position.y <= -100) {
     cameraBody.position.set(0, 0.5, 70)
+    cameraBody.velocity.set(0,0,0)
+    timerMesh.position.set(0,0,0)
   }
   // sphereBody.applyForce(new CANNON.Vec3(-.05, 0, 0), sphereBody.position)
 
