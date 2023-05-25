@@ -240,7 +240,7 @@ const cameraBody = new CANNON.Body({
   // type: 4
 })
 world.addBody(cameraBody)
-cameraBody.position.set(0, 1, 70)
+cameraBody.position.set(31, 1, -18)
 
 
 
@@ -318,6 +318,17 @@ directionalLight.shadow.camera.bottom = -30;
 
 // const helper = new THREE.DirectionalLightHelper(directionalLight);
 // scene.add(helper);
+
+// -----------Create an exit
+
+const exitGeometry = new THREE.BoxGeometry(1, 5, 1)
+const exitMaterial = new THREE.MeshStandardMaterial({
+  map : textureLoader.load('https://ucarecdn.com/43890b1b-e3a4-44a3-ac84-b2f44e31a2ff/')
+})
+const exit = new THREE.Mesh(exitGeometry, exitMaterial)
+scene.add(exit)
+exit.position.set(30.75, 0, -17.25)
+
 // ----------------Utilities-----------
 
 const objectsToUpdate = []
