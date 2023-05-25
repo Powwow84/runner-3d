@@ -420,18 +420,18 @@ const callTimer = () => {
   scene.add(timerMesh);
   timerMesh.position.set(-9, 30, 2);
   timerMesh.rotation.x = Math.PI / 2
-  if (cameraBody.position.z >= 70) {
-    timerMesh.position.set(0,0,0)
-  }
+  // if (cameraBody.position.z >= 70) {
+  //   timerMesh.position.set(0,0,0)
+  // }
 });
 }
 
 const checkTime = () => {
   if (timer <= 0) {
-    timer = 60
+    // timer = 60 //set in the startgame click function now
     cameraBody.position.set(0,-20,0)
-    countdown.pause()
-    timerMesh.position.set(0, -1, 0);
+    // countdown.pause()
+    // timerMesh.position.set(0, -1, 0);
   }
 }
 
@@ -465,6 +465,7 @@ renderer.domElement.addEventListener('click', function (event) {
     bgMusic.loop = true
     lookMessage.position.set(-18, 45, -15)
     findText.position.set(-18, 20, 0);
+    timer = 60
     countdown()
     setTimeout(function() {
       findText.position.set(-18, -7, 0);
@@ -571,7 +572,7 @@ function animate() {
   if (cameraBody.position.y <= -100) {
     cameraBody.position.set(0, 0.5, 70)
     cameraBody.velocity.set(0,0,0)
-    timerMesh.position.set(0,0,0)
+    // timerMesh.position.set(0,0,0)
   }
   // sphereBody.applyForce(new CANNON.Vec3(-.05, 0, 0), sphereBody.position)
 
