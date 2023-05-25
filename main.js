@@ -397,7 +397,7 @@ const callTimer = () => {
   });
   timerMesh = new THREE.Mesh(fontgeometry, fontMaterial);
   scene.add(timerMesh);
-  timerMesh.position.set(0, 30, 0);
+  timerMesh.position.set(-9, 30, 2);
   timerMesh.rotation.x = Math.PI / 2
   if (cameraBody.position.z === 70) {
     timerMesh.position.set(0,0,0)
@@ -448,8 +448,7 @@ renderer.domElement.addEventListener('click', function (event) {
     setTimeout(function() {
       findText.position.set(-18, -5, 0);
       lookMessage.position.set(-18, -5, -15);
-    }, 5000);
-    console.log(setTimeout)
+    }, 2000);
    
   }
 });
