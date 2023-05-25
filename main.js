@@ -323,11 +323,12 @@ directionalLight.shadow.camera.bottom = -30;
 
 const exitGeometry = new THREE.BoxGeometry(1, 5, 1)
 const exitMaterial = new THREE.MeshStandardMaterial({
-  map : textureLoader.load('https://ucarecdn.com/43890b1b-e3a4-44a3-ac84-b2f44e31a2ff/')
+  map : textureLoader.load('https://ucarecdn.com/931fe6e8-be81-4f7a-b04c-0dc6905882be/')
 })
 const exit = new THREE.Mesh(exitGeometry, exitMaterial)
 scene.add(exit)
 exit.position.set(30.75, 0, -17.25)
+
 
 // ----------------Utilities-----------
 
@@ -497,6 +498,23 @@ renderer.domElement.addEventListener('click', function (event) {
     cameraBody.position.set(-30, 50, 8)
     restartMusic.play()
     restartMusic.loop = true
+    bgMusic.pause()
+    timer = 60
+    countdown()
+    
+  }
+});
+
+renderer.domElement.addEventListener('click', function (event) {
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObject(exit);
+  if (intersects.length > 0) {
+    exit.position.set(30.75, 5, -17.25)
+ 
     bgMusic.pause()
   }
 });
