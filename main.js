@@ -27,8 +27,9 @@ const gameInit = () => {
   camera.position.set(0, 1, 0);
   // Create a scene
   const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x202020, 0, 5)
-
+  scene.fog = new THREE.Fog(0x202020, 0, 7)
+  
+  const textureLoader = new THREE.TextureLoader()
 // Add OrbitControls
 // const orbitControls = new OrbitControls(camera, renderer.domElement);
 // orbitControls.update()
@@ -41,12 +42,25 @@ const restartMusic = new Audio('public/music/tunetank.com_5212_castle-in-the-vil
 
 // -------------------Start Box-------------
 
-const startBox = new THREE.BoxGeometry(1 , .5 ,1)
-const startButtonMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000})
-const startButton = new THREE.Mesh(startBox, startButtonMaterial)
+const startBox = new THREE.BoxGeometry(.5 , .2 ,.2)
+// const startButtonMaterial = new THREE.MeshStandardMaterial({ 
+  // color: 0xffffff,
+//   map: textureLoader.load('public/imgs/Untitled design/Ready.jpg')
+// })
+const startButtonMultiMaterial = [ 
+  new THREE.MeshBasicMaterial({map: textureLoader.load('public/imgs/Untitled design/Ready.jpg')}),
+  new THREE.MeshBasicMaterial({map: textureLoader.load('public/imgs/Untitled design/Ready.jpg')}),
+  new THREE.MeshBasicMaterial({map: textureLoader.load('public/imgs/Untitled design/Ready.jpg')}),
+  new THREE.MeshBasicMaterial({map: textureLoader.load('public/imgs/Untitled design/Ready2.jpg')}),
+  new THREE.MeshBasicMaterial({map: textureLoader.load('public/imgs/Untitled design/Ready3.jpg')}),
+  new THREE.MeshBasicMaterial({map: textureLoader.load('public/imgs/Untitled design/Ready4.jpg')}),
+]
+const startButton = new THREE.Mesh(startBox, startButtonMultiMaterial)
 scene.add(startButton)
-startButton.position.set(-4,0,66)
+startButton.position.set(0,.3,69)
 startButton.rotation.x = Math.PI / -2
+startButton.castShadow = true
+
 
 //  ------------------- Restart Sphere -----------
 
@@ -82,6 +96,8 @@ loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', fu
   // textMesh.rotation.x = Math.PI / -2
 } );
 
+let threeD
+
 loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', function ( font ){
 
 	const fontgeometry = new TextGeometry( '3D', {
@@ -97,10 +113,10 @@ loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', fu
 	} );
   const fontMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000, fog: false });
   
-  const textMesh = new THREE.Mesh(fontgeometry, fontMaterial);
-  scene.add(textMesh);
-  textMesh.position.set(9, 0, 30);
-  // textMesh.rotation.x = 5.5
+  threeD = new THREE.Mesh(fontgeometry, fontMaterial);
+  scene.add(threeD);
+  threeD.position.set(9, 0, 30);
+  // threeD.rotation.x = 0
 } );
 
 let lookMessage;
@@ -179,9 +195,6 @@ const world = new CANNON.World()
 world.gravity.set(0, -9.82, 0)
 
 
-// ------------Texture loaders --------------
-const textureLoader = new THREE.TextureLoader()
-
 // ---------------------Generate default material-----
 
 const defaultMaterial = new CANNON.Material('default')
@@ -227,7 +240,7 @@ scene.background = cubeTextureLoader.load([
 // Create a plane
 const planeGeometry = new THREE.BoxGeometry(100, 100, 5);
 const planeMaterial = new THREE.MeshPhongMaterial({
-  map: textureLoader.load('public/imgs/Untitled design/4.jpg') });
+  map: textureLoader.load('public/imgs/Untitled design/Untitled design (1).jpg') });
 const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
 planeMesh.receiveShadow = true; // Enable shadow casting on the plane
 scene.add(planeMesh);
@@ -248,7 +261,7 @@ world.addBody(floorBody)
 
 const platformGeometry = new THREE.PlaneGeometry(10, 10);
 const platformMaterial = new THREE.MeshPhongMaterial({
-  map: textureLoader.load('public/imgs/Untitled design/4.jpg') });
+  map: textureLoader.load('public/imgs/Untitled design/Untitled design (1).jpg') });
 const platformMesh = new THREE.Mesh(platformGeometry, platformMaterial);
 platformMesh.receiveShadow = true; // Enable shadow casting on the plane
 platformMesh.position.set(0, 0, 70)
@@ -272,15 +285,15 @@ const ambientLight = new THREE.AmbientLight(0x404040);
 ambientLight.intensity = .5 // Ambient light
 scene.add(ambientLight);
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, .3); // Directional light
-directionalLight.position.set(-30, 80, 25);
+const directionalLight = new THREE.DirectionalLight(0xffffff, .2); // Directional light
+directionalLight.position.set(-30, 40, 25);
 directionalLight.castShadow = true; // Enable shadow casting from the light
 scene.add(directionalLight);
 
-directionalLight.shadow.camera.left = -50;   // Adjust left value
-directionalLight.shadow.camera.right = 50;   // Adjust right value
-directionalLight.shadow.camera.top = 50;     // Adjust top value
-directionalLight.shadow.camera.bottom = -50;
+directionalLight.shadow.camera.left = -30;   // Adjust left value
+directionalLight.shadow.camera.right = 30;   // Adjust right value
+directionalLight.shadow.camera.top = 30;     // Adjust top value
+directionalLight.shadow.camera.bottom = -30;
 
 // const helper = new THREE.DirectionalLightHelper(directionalLight);
 // scene.add(helper);
@@ -351,6 +364,57 @@ function createMaze() {
 }
 
 createMaze();
+
+
+// ------------Game timer --------------
+
+let timer = 60;
+let timerMesh; // Declare textMesh outside the loader callback
+
+function updateTimerText(font) {
+  if (timerMesh) {
+    scene.remove(timerMesh)
+    timerMesh.geometry.dispose(); // Dispose the previous geometry
+    timerMesh.material.dispose();
+     // Dispose the previous geometry
+   // Update the geometry of the text mesh
+  }
+}
+
+const callTimer = () => {
+  loader.load('https://threejs.org/examples/fonts/optimer_bold.typeface.json', function (font) {
+  const fontMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000, fog: false });
+  const fontgeometry = new TextGeometry(`${timer}`, {
+    font: font,
+    size: 3,
+    height: 0,
+    curveSegments: 12,
+    bevelEnabled: true,
+    bevelThickness: 1,
+    bevelSize: 0,
+    bevelOffset: 0,
+    bevelSegments: 1,
+  });
+  timerMesh = new THREE.Mesh(fontgeometry, fontMaterial);
+  scene.add(timerMesh);
+  timerMesh.position.set(0, 30, 0);
+  // updateTimerText()
+});
+}
+
+function countdown() {
+  console.log(timer);
+  timer--;
+  updateTimerText();
+  callTimer()
+  
+  if (timer >= 0) {
+    setTimeout(countdown, 1000);
+  }
+}
+
+countdown();
+
 
 // --------------------Restart FUnctions
 
@@ -492,9 +556,11 @@ if (keys['w'] && cameraBody.position.y <= 1) {
 } else if (keys['d'] && cameraBody.position.y <= 3) {
   cameraBody.applyImpulse(new CANNON.Vec3(force * deltaTime, 0, 0));
 }
+
   // cameraBody.position.copy(controls.getObject().position);
   // cameraBody.quaternion.copy(controls.getObject().quaternion);
   camera.position.copy(cameraBody.position);
+  startButton.rotation.x += .005
   // camera.quaternion.copy(cameraBody.quaternion);​
   requestAnimationFrame(animate);
   renderer.render(scene, camera);

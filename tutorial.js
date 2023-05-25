@@ -121,7 +121,7 @@
 // const box2 = new THREE.Mesh(box2Geometry, box2MultiMaterial)
 // scene.add(box2)
 // box2.position.set(0,15,10)
-// // box2.material.map = textureLoader.load('public/imgs/space-2560x1440-l122pd4lxyo3fug5.jpeg')
+// box2.material.map = textureLoader.load('public/imgs/space-2560x1440-l122pd4lxyo3fug5.jpeg')
 
 // const plane2Geometry = new THREE.PlaneGeometry(10,10,10,10)
 // const plane2Material = new THREE.MeshBasicMaterial({
