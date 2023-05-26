@@ -216,7 +216,7 @@ loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', fu
 		bevelOffset: 0,
 		bevelSegments: 1
 	} );
-  const fontMaterial = new THREE.MeshBasicMaterial({ color: 0x39ff14 , fog : false });
+  const fontMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 , fog : false });
   
   const textMesh = new THREE.Mesh(fontgeometry, fontMaterial);
   scene.add(textMesh);
@@ -525,6 +525,8 @@ renderer.domElement.addEventListener('click', function (event) {
   if (intersects.length > 0) {
     winMusic.pause()
     winMusic.currentTime = 0
+    restart.position.set(37.5, -3, -30);
+    winner.position.set(18.5, -3, -30);
     cameraBody.position.set(-30, 50, 8)
     restartMusic.play()
     restartMusic.loop = true
