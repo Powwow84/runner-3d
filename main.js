@@ -27,7 +27,7 @@ const gameInit = () => {
   camera.position.set(0, 1, 0);
   // Create a scene
   const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x202020, 0, 5)
+  scene.fog = new THREE.Fog(0x202020, 0, 6)
   
   const textureLoader = new THREE.TextureLoader()
 // Add OrbitControls
@@ -36,15 +36,15 @@ const gameInit = () => {
 
 // ----------------------------Files---------------------------------
 
-const bgMusic = new Audio('public/music/tunetank.com_5614_countdown-horror-trailer_by_audiotime.mp3')
+const bgMusic = new Audio('https://res.cloudinary.com/dpxbrpprt/video/upload/v1685078423/Runner-3d%20audio/tunetank.com_5614_countdown-horror-trailer_by_audiotime_gybqpw.mp3')
 
 const restartMusic = new Audio('public/music/tunetank.com_5196_secrets-of-the-house-on-the-hill_by_rage-sound.mp3')
 
 const winMusic = new Audio('public/music/tunetank.com_5212_castle-in-the-village_by_rage-sound-02-02.mp3')
 
-const loseSFX = new Audio('public/music/133674__klankbeeld__horror-laugh-original-132802__nanakisan__evil-laugh-08.wav')
+const loseSFX = new Audio('https://res.cloudinary.com/dpxbrpprt/video/upload/v1685078425/Runner-3d%20audio/133674__klankbeeld__horror-laugh-original-132802__nanakisan__evil-laugh-08_uuc1l8.wav')
 
-const whoosh = new Audio('public/music/683664__eponn__dark-bell-scary.wav')
+const whoosh = new Audio('https://res.cloudinary.com/dpxbrpprt/video/upload/v1685078427/Runner-3d%20audio/683664__eponn__dark-bell-scary_mxrjhe.wav')
 
 // -------------------Start Box-------------
 
@@ -474,18 +474,6 @@ const checkTime = () => {
     // timerMesh.position.set(0, -1, 0);
   }
 }
-
-// function countdown() {
-//   console.log(timer);
-//   timer--;
-//   updateTimerText();
-//   callTimer()
-//   checkTime()
-  
-//   if (timer >= 1) {
-//     setTimeout(countdown, 1000);
-//   }
-// }
 
 const countdown = () => {
   timerId = setInterval(function(){
