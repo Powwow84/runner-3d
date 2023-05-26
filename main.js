@@ -343,7 +343,8 @@ directionalLight.shadow.camera.bottom = -30;
 
 const exitGeometry = new THREE.BoxGeometry(1, 2, 1)
 const exitMaterial = new THREE.MeshStandardMaterial({
-  map : textureLoader.load('https://ucarecdn.com/931fe6e8-be81-4f7a-b04c-0dc6905882be/')
+  map : textureLoader.load('https://ucarecdn.com/931fe6e8-be81-4f7a-b04c-0dc6905882be/'),
+  normalMap: textureLoader.load('https://ucarecdn.com/86c2d86b-9157-4642-93a0-c51a1a4cc0da/')
 })
 const exit = new THREE.Mesh(exitGeometry, exitMaterial)
 scene.add(exit)
@@ -509,6 +510,7 @@ renderer.domElement.addEventListener('click', function (event) {
   const intersects = raycaster.intersectObject(startButton);
   if (intersects.length > 0) {
     cameraBody.position.set(0, 50, 0)
+    exit.position.set(30.75, .5, -17.25)
     winMusic.pause()
     winMusic.currentTime = 0
     bgMusic.play()
