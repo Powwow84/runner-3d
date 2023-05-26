@@ -27,7 +27,7 @@ const gameInit = () => {
   camera.position.set(0, 1, 0);
   // Create a scene
   const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x202020, 0, 7)
+  scene.fog = new THREE.Fog(0x202020, 0, 5)
   
   const textureLoader = new THREE.TextureLoader()
 // Add OrbitControls
@@ -36,9 +36,15 @@ const gameInit = () => {
 
 // ----------------------------Files---------------------------------
 
-const bgMusic = new Audio('public/music/tunetank.com_5196_secrets-of-the-house-on-the-hill_by_rage-sound.mp3')
+const bgMusic = new Audio('public/music/tunetank.com_5614_countdown-horror-trailer_by_audiotime.mp3')
 
-const restartMusic = new Audio('public/music/tunetank.com_5212_castle-in-the-village_by_rage-sound-02-02.mp3')
+const restartMusic = new Audio('public/music/tunetank.com_5196_secrets-of-the-house-on-the-hill_by_rage-sound.mp3')
+
+const winMusic = new Audio('public/music/tunetank.com_5212_castle-in-the-village_by_rage-sound-02-02.mp3')
+
+const loseSFX = new Audio('public/music/133674__klankbeeld__horror-laugh-original-132802__nanakisan__evil-laugh-08.wav')
+
+const whoosh = new Audio('public/music/683664__eponn__dark-bell-scary.wav')
 
 // -------------------Start Box-------------
 
@@ -66,11 +72,22 @@ startButton.castShadow = true
 
 const restartSphere = new THREE.SphereGeometry(2)
 const restartMaterial = new THREE.MeshStandardMaterial({
-color: 0xFFFFFF
+map: textureLoader.load('https://ucarecdn.com/74754d08-1da8-404b-acdd-1d5538524333/'),
+normalMap: textureLoader.load('https://ucarecdn.com/202822e4-9613-4918-98a7-f832061d8ae8/'),
+fog: false
 })
 const restart = new THREE.Mesh(restartSphere, restartMaterial)
 scene.add(restart)
-restart.position.set(35, 3, -30);
+restart.position.set(39, -3, -30);
+
+// const ballLight = new THREE.DirectionalLight(0xffffff, .5); // Directional light
+// ballLight.position.set(33, 0, -22);
+// ballLight.castShadow = true; // Enable shadow casting from the light
+// scene.add(ballLight);
+// ballLight.target = restart
+
+// const helper = new THREE.DirectionalLightHelper(ballLight);
+// scene.add(helper);
 
 
 const loader = new FontLoader();
@@ -165,12 +182,12 @@ loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', fu
   findText.rotation.x = Math.PI / -2;
 } );
 
-
+let winner
 loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', function ( font ){
 
-	const fontgeometry = new TextGeometry( 'Congrats', {
+	const fontgeometry = new TextGeometry( 'You Survived', {
 		font: font,
-		size: 3,
+		size: 2,
 		height: 0,
 		curveSegments: 12,
 		bevelEnabled: true,
@@ -179,11 +196,11 @@ loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', fu
 		bevelOffset: 0,
 		bevelSegments: 1
 	} );
-  const fontMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+  const fontMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000, fog: false });
   
-  const textMesh = new THREE.Mesh(fontgeometry, fontMaterial);
-  scene.add(textMesh);
-  textMesh.position.set(15, 2, -30);
+  winner = new THREE.Mesh(fontgeometry, fontMaterial);
+  scene.add(winner);
+  winner.position.set(16, -3, -30);
   
 } );
 loader.load( 'https://threejs.org/examples/fonts/optimer_bold.typeface.json', function ( font ){
@@ -240,7 +257,7 @@ const cameraBody = new CANNON.Body({
   // type: 4
 })
 world.addBody(cameraBody)
-cameraBody.position.set(31, 1, -18)
+cameraBody.position.set(0, 1, 70)
 
 
 
@@ -261,7 +278,9 @@ scene.background = cubeTextureLoader.load([
 // Create a plane
 const planeGeometry = new THREE.BoxGeometry(100, 100, 15);
 const planeMaterial = new THREE.MeshPhongMaterial({
-  map: textureLoader.load('https://ucarecdn.com/a263e549-78a6-4a36-b3e1-1b9f29691fbd/') });
+  map: textureLoader.load('https://ucarecdn.com/a263e549-78a6-4a36-b3e1-1b9f29691fbd/'),
+  normalMap: textureLoader.load('https://ucarecdn.com/8da6aa9f-a36b-4618-890f-6fa2fd28ace6/')
+});
 const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
 planeMesh.receiveShadow = true; // Enable shadow casting on the plane
 scene.add(planeMesh);
@@ -282,7 +301,8 @@ world.addBody(floorBody)
 
 const platformGeometry = new THREE.PlaneGeometry(10, 10);
 const platformMaterial = new THREE.MeshPhongMaterial({
-  map: textureLoader.load('https://ucarecdn.com/a263e549-78a6-4a36-b3e1-1b9f29691fbd/') });
+  map: textureLoader.load('https://ucarecdn.com/a263e549-78a6-4a36-b3e1-1b9f29691fbd/'),
+  normalMap: textureLoader.load('https://ucarecdn.com/8da6aa9f-a36b-4618-890f-6fa2fd28ace6/') });
 const platformMesh = new THREE.Mesh(platformGeometry, platformMaterial);
 platformMesh.receiveShadow = true; // Enable shadow casting on the plane
 platformMesh.position.set(0, 0, 70)
@@ -321,13 +341,13 @@ directionalLight.shadow.camera.bottom = -30;
 
 // -----------Create an exit
 
-const exitGeometry = new THREE.BoxGeometry(1, 5, 1)
+const exitGeometry = new THREE.BoxGeometry(1, 2, 1)
 const exitMaterial = new THREE.MeshStandardMaterial({
   map : textureLoader.load('https://ucarecdn.com/931fe6e8-be81-4f7a-b04c-0dc6905882be/')
 })
 const exit = new THREE.Mesh(exitGeometry, exitMaterial)
 scene.add(exit)
-exit.position.set(30.75, 0, -17.25)
+exit.position.set(30.75, .5, -17.25)
 
 
 // ----------------Utilities-----------
@@ -337,7 +357,8 @@ const objectsToUpdate = []
 // create box's
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1)
 const boxMaterial = new THREE.MeshStandardMaterial({
-  map: textureLoader.load('https://ucarecdn.com/43890b1b-e3a4-44a3-ac84-b2f44e31a2ff/') 
+  map: textureLoader.load('https://ucarecdn.com/43890b1b-e3a4-44a3-ac84-b2f44e31a2ff/'),
+  normalMap: textureLoader.load('https://ucarecdn.com/8338da0a-94e7-447f-ba40-282028b4056f/') 
 })
 
 
@@ -444,6 +465,11 @@ const checkTime = () => {
     // timer = 60 //set in the startgame click function now
     cameraBody.position.set(0,-20,0)
     clearInterval(timerId)
+    bgMusic.pause()
+    bgMusic.currentTime =0
+    restartMusic.pause()
+    restartMusic.currentTime = 0
+    loseSFX.play()
     // timerMesh.position.set(0, -1, 0);
   }
 }
@@ -483,6 +509,8 @@ renderer.domElement.addEventListener('click', function (event) {
   const intersects = raycaster.intersectObject(startButton);
   if (intersects.length > 0) {
     cameraBody.position.set(0, 50, 0)
+    winMusic.pause()
+    winMusic.currentTime = 0
     bgMusic.play()
     bgMusic.loop = true
     lookMessage.position.set(-18, 45, -15)
@@ -505,13 +533,16 @@ renderer.domElement.addEventListener('click', function (event) {
   raycaster.setFromCamera(mouse, camera);
   const intersects = raycaster.intersectObject(restart);
   if (intersects.length > 0) {
+    winMusic.pause()
+    winMusic.currentTime = 0
     cameraBody.position.set(-30, 50, 8)
     restartMusic.play()
     restartMusic.loop = true
     bgMusic.pause()
     timer = 60
     countdown()
-    
+    exit.position.set(30.75, .5, -17.25)
+    winMusic.pause
   }
 });
 
@@ -523,9 +554,14 @@ renderer.domElement.addEventListener('click', function (event) {
   raycaster.setFromCamera(mouse, camera);
   const intersects = raycaster.intersectObject(exit);
   if (intersects.length > 0) {
+    whoosh.play()
+    winMusic.play()
     exit.position.set(30.75, 5, -17.25)
- 
     bgMusic.pause()
+    bgMusic.currentTime = 0
+    clearInterval(timerId)
+    restart.position.set(37.5, 3, -30);
+    winner.position.set(18.5, 2, -30);
   }
 });
 
@@ -608,10 +644,12 @@ function animate() {
   const elapsedTime = clock.getElapsedTime()
   const deltaTime = elapsedTime - oldElapsedTIme
   oldElapsedTIme = elapsedTime
-  if (cameraBody.position.y <= -100) {
+  if (cameraBody.position.y <= -200) {
     cameraBody.position.set(0, 0.5, 70)
     cameraBody.velocity.set(0,0,0)
-    // timerMesh.position.set(0,0,0)
+    if(timerMesh) {
+      timerMesh.position.set(0,0,0)
+    }
   }
   // sphereBody.applyForce(new CANNON.Vec3(-.05, 0, 0), sphereBody.position)
 
@@ -643,6 +681,7 @@ if (keys['w'] && cameraBody.position.y <= 1) {
   // cameraBody.quaternion.copy(controls.getObject().quaternion);
   camera.position.copy(cameraBody.position);
   startButton.rotation.x += .005
+  restart.rotation.y -= .003
   // camera.quaternion.copy(cameraBody.quaternion);​
   requestAnimationFrame(animate);
   renderer.render(scene, camera);
