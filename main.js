@@ -27,7 +27,7 @@ const gameInit = () => {
   camera.position.set(0, 1, 0);
   // Create a scene
   const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x202020, 0, 6)
+  scene.fog = new THREE.Fog(0x202020, 0, 7)
   
   const textureLoader = new THREE.TextureLoader()
 // Add OrbitControls
@@ -38,9 +38,9 @@ const gameInit = () => {
 
 const bgMusic = new Audio('https://res.cloudinary.com/dpxbrpprt/video/upload/v1685078423/Runner-3d%20audio/tunetank.com_5614_countdown-horror-trailer_by_audiotime_gybqpw.mp3')
 
-const restartMusic = new Audio('public/music/tunetank.com_5196_secrets-of-the-house-on-the-hill_by_rage-sound.mp3')
+const restartMusic = new Audio('https://res.cloudinary.com/dpxbrpprt/video/upload/v1685078424/Runner-3d%20audio/tunetank.com_5196_secrets-of-the-house-on-the-hill_by_rage-sound_l50pi9.mp3')
 
-const winMusic = new Audio('public/music/tunetank.com_5212_castle-in-the-village_by_rage-sound-02-02.mp3')
+const winMusic = new Audio('https://res.cloudinary.com/dpxbrpprt/video/upload/v1685078423/Runner-3d%20audio/tunetank.com_5212_castle-in-the-village_by_rage-sound-02-02_h6dyef.mp3')
 
 const loseSFX = new Audio('https://res.cloudinary.com/dpxbrpprt/video/upload/v1685078425/Runner-3d%20audio/133674__klankbeeld__horror-laugh-original-132802__nanakisan__evil-laugh-08_uuc1l8.wav')
 
