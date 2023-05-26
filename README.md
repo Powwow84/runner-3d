@@ -22,6 +22,7 @@ Runner 3D is a 3 dimensional survival game built with React 3 fibre. The user wi
 * JavaScript
 * Three Js
 * React 3 Fibre
+* Cannon-es
 * Postgresql
 * Express
 
@@ -46,7 +47,6 @@ Runner 3D is a 3 dimensional survival game built with React 3 fibre. The user wi
 * As a user I want to be able to move around the maze
 * As a user I was to be able to win or lose
 * As a user I want to be able to replay the game after winning or losing
-* As a user I want to be able to restart the game at any point
 
 ---------------------------------------------------------
 
