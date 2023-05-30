@@ -46,26 +46,6 @@ const loseSFX = new Audio('https://res.cloudinary.com/dpxbrpprt/video/upload/v16
 
 const whoosh = new Audio('https://res.cloudinary.com/dpxbrpprt/video/upload/v1685078427/Runner-3d%20audio/683664__eponn__dark-bell-scary_mxrjhe.wav')
 
-// -------------------Start Box-------------
-
-const startBox = new THREE.BoxGeometry(.5 , .2 ,.2)
-// const startButtonMaterial = new THREE.MeshStandardMaterial({ 
-  // color: 0xffffff,
-//   map: textureLoader.load('public/imgs/Untitled design/Ready.jpg')
-// })
-const startButtonMultiMaterial = [ 
-  new THREE.MeshBasicMaterial({map: textureLoader.load('https://ucarecdn.com/755d63da-9342-446a-9c1a-e757354fda79/')}),
-  new THREE.MeshBasicMaterial({map: textureLoader.load('https://ucarecdn.com/755d63da-9342-446a-9c1a-e757354fda79/')}),
-  new THREE.MeshBasicMaterial({map: textureLoader.load('https://ucarecdn.com/755d63da-9342-446a-9c1a-e757354fda79/')}),
-  new THREE.MeshBasicMaterial({map: textureLoader.load('https://ucarecdn.com/0de6ff0f-f657-4f5e-8ffa-ce6cb80e2345/')}),
-  new THREE.MeshBasicMaterial({map: textureLoader.load('https://ucarecdn.com/bf044efc-9c3d-490e-bf06-4bb4fc058756/')}),
-  new THREE.MeshBasicMaterial({map: textureLoader.load('https://ucarecdn.com/1e7ca8c9-c20d-4724-912a-c9541772cae6/')}),
-]
-const startButton = new THREE.Mesh(startBox, startButtonMultiMaterial)
-scene.add(startButton)
-startButton.position.set(0,.3,69)
-startButton.rotation.x = Math.PI / -2
-startButton.castShadow = true
 
 
 //  ------------------- Restart Sphere -----------
@@ -241,7 +221,7 @@ const defaultContactMaterial = new CANNON.ContactMaterial(
   defaultMaterial,
   {
     friction: 0.001,
-    restitution: .5
+    restitution: .4
   }
 )
 world.addContactMaterial(defaultContactMaterial)
@@ -252,13 +232,43 @@ world.defaultContactMaterial = defaultContactMaterial
 
 const cameraBody = new CANNON.Body({
   mass: 1,
-  shape: new CANNON.Box(new CANNON.Vec3(.2, .5, .1)),
+  shape: new CANNON.Box(new CANNON.Vec3(.1, .5, .1)),
   fixedRotation: true
   // type: 4
 })
 world.addBody(cameraBody)
 cameraBody.position.set(0, 1, 70)
+// cameraBody.linearDamping = 0.3
 
+
+// -------------------Start Box-------------
+
+const startBox = new THREE.BoxGeometry(.5 , .2 ,.2)
+// const startButtonMaterial = new THREE.MeshStandardMaterial({ 
+  // color: 0xffffff,
+//   map: textureLoader.load('public/imgs/Untitled design/Ready.jpg')
+// })
+const startButtonMultiMaterial = [ 
+  new THREE.MeshBasicMaterial({map: textureLoader.load('https://ucarecdn.com/755d63da-9342-446a-9c1a-e757354fda79/')}),
+  new THREE.MeshBasicMaterial({map: textureLoader.load('https://ucarecdn.com/755d63da-9342-446a-9c1a-e757354fda79/')}),
+  new THREE.MeshBasicMaterial({map: textureLoader.load('https://ucarecdn.com/755d63da-9342-446a-9c1a-e757354fda79/')}),
+  new THREE.MeshBasicMaterial({map: textureLoader.load('https://ucarecdn.com/0de6ff0f-f657-4f5e-8ffa-ce6cb80e2345/')}),
+  new THREE.MeshBasicMaterial({map: textureLoader.load('https://ucarecdn.com/bf044efc-9c3d-490e-bf06-4bb4fc058756/')}),
+  new THREE.MeshBasicMaterial({map: textureLoader.load('https://ucarecdn.com/1e7ca8c9-c20d-4724-912a-c9541772cae6/')}),
+]
+const startButton = new THREE.Mesh(startBox, startButtonMultiMaterial)
+scene.add(startButton)
+startButton.position.set(0,.3,69)
+startButton.rotation.x = Math.PI / -2
+startButton.castShadow = true
+startButton.receiveShadow = true
+
+const startBody = new CANNON.Body({
+  mass: 10,
+  shape: new CANNON.Box(new CANNON.Vec3(.25, .1, .1))
+})
+world.addBody(startBody)
+startBody.position.set(0, .3, 69)
 
 
 // -----------------Creating the cube texture for the world environment
@@ -275,7 +285,7 @@ scene.background = cubeTextureLoader.load([
 
 ])
 
-// Create a plane
+// ----------------------------------Create a plane
 const planeGeometry = new THREE.BoxGeometry(100, 100, 15);
 const planeMaterial = new THREE.MeshPhongMaterial({
   map: textureLoader.load('https://ucarecdn.com/a263e549-78a6-4a36-b3e1-1b9f29691fbd/'),
@@ -297,7 +307,7 @@ floorBody.quaternion.setFromAxisAngle(
 )
 world.addBody(floorBody)
 
-// Create platform
+// ------------------------------------------Create platform
 
 const platformGeometry = new THREE.PlaneGeometry(10, 10);
 const platformMaterial = new THREE.MeshPhongMaterial({
@@ -321,7 +331,7 @@ world.addBody(platformBody)
 platformBody.position.set(0, 0, 70)
 
 
-// Create lighting
+// ----------------------------------Create lighting
 const ambientLight = new THREE.AmbientLight(0x404040);
 ambientLight.intensity = .5 // Ambient light
 scene.add(ambientLight);
@@ -331,10 +341,10 @@ directionalLight.position.set(-30, 40, 25);
 directionalLight.castShadow = true; // Enable shadow casting from the light
 scene.add(directionalLight);
 
-directionalLight.shadow.camera.left = -30;   // Adjust left value
-directionalLight.shadow.camera.right = 30;   // Adjust right value
-directionalLight.shadow.camera.top = 30;     // Adjust top value
-directionalLight.shadow.camera.bottom = -30;
+directionalLight.shadow.camera.left = -100;   // Adjust left value
+directionalLight.shadow.camera.right = 100;   // Adjust right value
+directionalLight.shadow.camera.top = 100;     // Adjust top value
+directionalLight.shadow.camera.bottom = -1000;
 
 // const helper = new THREE.DirectionalLightHelper(directionalLight);
 // scene.add(helper);
@@ -372,7 +382,7 @@ const createBox = (width, height, depth, position) => {
   scene.add(mesh);
 
   // cannon shapes
-  const shape = new CANNON.Box(new CANNON.Vec3(width / 2, height / 2, depth / 2));
+  const shape = new CANNON.Box(new CANNON.Vec3((width / 2) + .25, (height / 2) + .25, (depth / 2)+ .25));
   const body = new CANNON.Body({
     mass: 10, //0.000001,
     type: 2,
@@ -556,6 +566,7 @@ renderer.domElement.addEventListener('click', function (event) {
     winner.position.set(18.5, 2, -30);
   }
 });
+
 
 // ------------------------------Cnntrols--------------
 

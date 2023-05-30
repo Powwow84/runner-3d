@@ -2,7 +2,7 @@
 ------------------------------------------------------
 ## The Sequel
 
-From the creator of the game HIT MAIZE Runner comes Runner 3D!! You, the user will have to beat the clock as you run through a 3D maze filled with monsters and obsticles. Happy running and mind the traps.
+From the creator of the hit game MAIZE Runner comes Runner 3D!! You, the user will have to beat the clock as you run through a 3D maze filled with monsters and obsticles. Happy running and mind the traps.
 
 ------------------------------------------------------
 ## Synopsis
