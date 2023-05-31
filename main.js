@@ -238,7 +238,7 @@ const cameraBody = new CANNON.Body({
 })
 world.addBody(cameraBody)
 cameraBody.position.set(0, 1, 70)
-cameraBody.linearDamping = 0.5
+cameraBody.linearDamping = 0.8
 
 // -------------------Start Box-------------
 
@@ -662,7 +662,7 @@ function animate() {
     object.mesh.position.copy(object.body.position)
   }
   // sphereMesh.position.copy(sphereBody.position)
-  const force = 5;
+  const force = 6;
 
 if (keys['w'] && cameraBody.position.y <= 1) {
   let input = new CANNON.Vec3(0, 0, -force * deltaTime);
