@@ -646,7 +646,7 @@ function animate() {
   const elapsedTime = clock.getElapsedTime()
   const deltaTime = elapsedTime - oldElapsedTIme
   oldElapsedTIme = elapsedTime
-  if (cameraBody.position.y <= -200) {
+  if (cameraBody.position.y <= -100) {
     cameraBody.position.set(0, 0.5, 70)
     cameraBody.velocity.set(0,0,0)
     if(timerMesh) {
