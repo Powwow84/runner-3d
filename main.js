@@ -6,6 +6,7 @@ import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js'
 import CannonDebugger from 'cannon-es-debugger';
+import gsap from 'gsap'
 
 
 // --------------Three Js setup ----------------
@@ -263,7 +264,7 @@ startButton.castShadow = true
 startButton.receiveShadow = true
 
 const startBody = new CANNON.Body({
-  mass: 10,
+  mass: 100,
   shape: new CANNON.Box(new CANNON.Vec3(.25, .1, .1))
 })
 world.addBody(startBody)
@@ -557,7 +558,8 @@ renderer.domElement.addEventListener('click', function (event) {
   if (intersects.length > 0) {
     whoosh.play()
     winMusic.play()
-    exit.position.set(30.75, 5, -17.25)
+    // exit.position.set(30.75, 5, -17.25)
+    gsap.to(exit.position, {duration: 2, delay: 0, y:5})
     bgMusic.pause()
     bgMusic.currentTime = 0
     clearInterval(timerId)
