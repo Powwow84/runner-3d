@@ -220,8 +220,8 @@ const defaultContactMaterial = new CANNON.ContactMaterial(
   defaultMaterial,
   defaultMaterial,
   {
-    friction: 0.001,
-    restitution: .4
+    friction: 0.0001,
+    restitution: 0
   }
 )
 world.addContactMaterial(defaultContactMaterial)
@@ -238,7 +238,7 @@ const cameraBody = new CANNON.Body({
 })
 world.addBody(cameraBody)
 cameraBody.position.set(0, 1, 70)
-// cameraBody.linearDamping = 0.3
+cameraBody.linearDamping = 0.3
 
 
 // -------------------Start Box-------------
