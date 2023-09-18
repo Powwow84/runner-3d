@@ -244,7 +244,7 @@ const cameraBody = new CANNON.Body({
   // type: 4
 })
 world.addBody(cameraBody)
-cameraBody.position.set(20, 1, -15)
+cameraBody.position.set(0, 1, 70)
 cameraBody.linearDamping = 0.8
 
 // -------------------Start Box-------------
