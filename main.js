@@ -51,9 +51,15 @@ const whoosh = new Audio('https://res.cloudinary.com/dpxbrpprt/video/upload/v168
 
 //  ------------------- Restart Sphere -----------
 
+const restartTexture = textureLoader.load('https://ucarecdn.com/74754d08-1da8-404b-acdd-1d5538524333/', function(texture) {
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+});
+restartTexture.colorSpace = THREE.SRGBColorSpace;
+
 const restartSphere = new THREE.SphereGeometry(2)
 const restartMaterial = new THREE.MeshStandardMaterial({
-map: textureLoader.load('https://ucarecdn.com/74754d08-1da8-404b-acdd-1d5538524333/'),
+map: restartTexture,
 normalMap: textureLoader.load('https://ucarecdn.com/202822e4-9613-4918-98a7-f832061d8ae8/'),
 fog: false
 })
@@ -238,27 +244,28 @@ const cameraBody = new CANNON.Body({
   // type: 4
 })
 world.addBody(cameraBody)
-cameraBody.position.set(0, 1, 70)
+cameraBody.position.set(20, 1, -15)
 cameraBody.linearDamping = 0.8
 
 // -------------------Start Box-------------
 
-const startBox = new THREE.BoxGeometry(.5 , .2 ,.2)
+const startBox = new THREE.BoxGeometry(.6, .05 ,1.5)
 // const startButtonMaterial = new THREE.MeshStandardMaterial({ 
   // color: 0xffffff,
 //   map: textureLoader.load('public/imgs/Untitled design/Ready.jpg')
 // })
-const startButtonMultiMaterial = [ 
-  new THREE.MeshBasicMaterial({map: textureLoader.load('https://ucarecdn.com/755d63da-9342-446a-9c1a-e757354fda79/')}),
-  new THREE.MeshBasicMaterial({map: textureLoader.load('https://ucarecdn.com/755d63da-9342-446a-9c1a-e757354fda79/')}),
-  new THREE.MeshBasicMaterial({map: textureLoader.load('https://ucarecdn.com/755d63da-9342-446a-9c1a-e757354fda79/')}),
-  new THREE.MeshBasicMaterial({map: textureLoader.load('https://ucarecdn.com/0de6ff0f-f657-4f5e-8ffa-ce6cb80e2345/')}),
-  new THREE.MeshBasicMaterial({map: textureLoader.load('https://ucarecdn.com/bf044efc-9c3d-490e-bf06-4bb4fc058756/')}),
-  new THREE.MeshBasicMaterial({map: textureLoader.load('https://ucarecdn.com/1e7ca8c9-c20d-4724-912a-c9541772cae6/')}),
-]
-const startButton = new THREE.Mesh(startBox, startButtonMultiMaterial)
+
+const doorTexture = textureLoader.load('https://res.cloudinary.com/dpxbrpprt/image/upload/v1695005371/Portfolio%20textures/Untitled_design_8_u8lfjf.png', function(texture) {
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+});
+doorTexture.colorSpace = THREE.SRGBColorSpace;
+
+const doorMaterial = new THREE.MeshBasicMaterial({ map: doorTexture });
+
+const startButton = new THREE.Mesh(startBox, doorMaterial)
 scene.add(startButton)
-startButton.position.set(0,.3,69)
+startButton.position.set(-2,.5,67)
 startButton.rotation.x = Math.PI / -2
 startButton.castShadow = true
 startButton.receiveShadow = true
@@ -268,7 +275,23 @@ const startBody = new CANNON.Body({
   shape: new CANNON.Box(new CANNON.Vec3(.25, .1, .1))
 })
 world.addBody(startBody)
-startBody.position.set(0, .3, 69)
+startBody.position.set(0, 30, 60)
+
+// __________________Sign ____________________-
+
+const signTexture = textureLoader.load('https://res.cloudinary.com/dpxbrpprt/image/upload/v1695009607/Portfolio%20textures/1_7_tzyb2j.png', function(texture) {
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+});
+signTexture.colorSpace = THREE.SRGBColorSpace;
+
+const signGeomtery = new THREE.BoxGeometry(.8, .5, .5)
+const signMaterial = new THREE.MeshBasicMaterial({ map: signTexture})
+const sign = new THREE.Mesh(signGeomtery, signMaterial)
+scene.add(sign)
+sign.position.set(1.2,.3,68.7)
+sign.rotation.x = Math.PI / -2
+sign.rotation.z = Math.PI / -4.5
 
 
 // -----------------Creating the cube texture for the world environment
@@ -286,9 +309,16 @@ scene.background = cubeTextureLoader.load([
 ])
 
 // ----------------------------------Create a plane
+
+const floorTexture = textureLoader.load('https://ucarecdn.com/a263e549-78a6-4a36-b3e1-1b9f29691fbd/', function(texture) {
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+});
+floorTexture.colorSpace = THREE.SRGBColorSpace;
+
 const planeGeometry = new THREE.BoxGeometry(100, 100, 15);
 const planeMaterial = new THREE.MeshPhongMaterial({
-  map: textureLoader.load('https://ucarecdn.com/a263e549-78a6-4a36-b3e1-1b9f29691fbd/'),
+  map: floorTexture,
   normalMap: textureLoader.load('https://ucarecdn.com/8da6aa9f-a36b-4618-890f-6fa2fd28ace6/')
 });
 const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
@@ -309,9 +339,15 @@ world.addBody(floorBody)
 
 // ------------------------------------------Create platform
 
+const platformTexture = textureLoader.load( 'https://ucarecdn.com/a263e549-78a6-4a36-b3e1-1b9f29691fbd/', function(texture) {
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+});
+platformTexture.colorSpace = THREE.SRGBColorSpace;
+
 const platformGeometry = new THREE.PlaneGeometry(10, 10);
 const platformMaterial = new THREE.MeshPhongMaterial({
-  map: textureLoader.load('https://ucarecdn.com/a263e549-78a6-4a36-b3e1-1b9f29691fbd/'),
+  map: platformTexture,
   normalMap: textureLoader.load('https://ucarecdn.com/8da6aa9f-a36b-4618-890f-6fa2fd28ace6/') });
 const platformMesh = new THREE.Mesh(platformGeometry, platformMaterial);
 platformMesh.receiveShadow = true; // Enable shadow casting on the plane
@@ -353,7 +389,7 @@ directionalLight.shadow.camera.bottom = -1000;
 
 const exitGeometry = new THREE.BoxGeometry(1, 2, 1)
 const exitMaterial = new THREE.MeshStandardMaterial({
-  map : textureLoader.load('https://ucarecdn.com/931fe6e8-be81-4f7a-b04c-0dc6905882be/'),
+  map : doorTexture,
   normalMap: textureLoader.load('https://ucarecdn.com/86c2d86b-9157-4642-93a0-c51a1a4cc0da/')
 })
 const exit = new THREE.Mesh(exitGeometry, exitMaterial)
@@ -365,10 +401,16 @@ exit.position.set(30.75, .5, -17.25)
 
 const objectsToUpdate = []
 
+const wallTexture = textureLoader.load('https://ucarecdn.com/43890b1b-e3a4-44a3-ac84-b2f44e31a2ff/', function(texture) {
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+});
+wallTexture.colorSpace = THREE.SRGBColorSpace;
+
 // create box's
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1)
 const boxMaterial = new THREE.MeshStandardMaterial({
-  map: textureLoader.load('https://ucarecdn.com/43890b1b-e3a4-44a3-ac84-b2f44e31a2ff/'),
+  map: wallTexture,
   normalMap: textureLoader.load('https://ucarecdn.com/8338da0a-94e7-447f-ba40-282028b4056f/') 
 })
 
@@ -499,7 +541,7 @@ const countdown = () => {
 
 // --------------------Restart FUnctions
 
-renderer.domElement.addEventListener('click', function (event) {
+document.addEventListener('click', function (event) {
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -548,7 +590,7 @@ renderer.domElement.addEventListener('click', function (event) {
   }
 });
 
-renderer.domElement.addEventListener('click', function (event) {
+document.addEventListener('click', function (event) {
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -605,15 +647,15 @@ document.addEventListener('keydown', function (event) {
     case 'KeyW':
       keys['w'] = true
       break;
-    case 'KeyS':
-      keys['s'] = true
-      break;
-    case 'KeyA':
-      keys['a'] = true
-      break;
-    case 'KeyD':
-      keys['d'] = true
-      break;
+    // case 'KeyS':
+    //   keys['s'] = true
+    //   break;
+    // case 'KeyA':
+    //   keys['a'] = true
+    //   break;
+    // case 'KeyD':
+    //   keys['d'] = true
+    //   break;
   }
 })
 
@@ -623,15 +665,15 @@ document.addEventListener('keyup', function (event) {
     case 'KeyW':
       keys['w'] = false
       break;
-    case 'KeyS':
-      keys['s'] = false
-      break;
-    case 'KeyA':
-      keys['a'] = false
-      break;
-    case 'KeyD':
-      keys['d'] = false
-      break;
+    // case 'KeyS':
+    //   keys['s'] = false
+    //   break;
+    // case 'KeyA':
+    //   keys['a'] = false
+    //   break;
+    // case 'KeyD':
+    //   keys['d'] = false
+    //   break;
   }
 })
 
@@ -673,18 +715,17 @@ if (keys['w'] && cameraBody.position.y <= 1) {
   cam.copy(cameraRotation);
   let world = cam.vmult(input);
   cameraBody.applyImpulse(world);
-} else if (keys['a'] && cameraBody.position.y <= 3) {
+} else if (keys['space'] && cameraBody.position.y <= 3) {
   cameraBody.applyImpulse(new CANNON.Vec3(-force * deltaTime, 0, 0));
-} else if (keys['s'] && cameraBody.position.y <= 3) {
+} else if (keys['space'] && cameraBody.position.y <= 3) {
   cameraBody.applyImpulse(new CANNON.Vec3(0, 0, force * deltaTime));
-} else if (keys['d'] && cameraBody.position.y <= 3) {
+} else if (keys['space'] && cameraBody.position.y <= 3) {
   cameraBody.applyImpulse(new CANNON.Vec3(force * deltaTime, 0, 0));
 }
 
   // cameraBody.position.copy(controls.getObject().position);
   // cameraBody.quaternion.copy(controls.getObject().quaternion);
   camera.position.copy(cameraBody.position);
-  startButton.rotation.x += .005
   restart.rotation.y -= .003
   // camera.quaternion.copy(cameraBody.quaternion);​
   requestAnimationFrame(animate);
