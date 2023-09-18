@@ -567,7 +567,7 @@ document.addEventListener('click', function (event) {
   }
 });
 
-renderer.domElement.addEventListener('click', function (event) {
+document.addEventListener('click', function (event) {
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
